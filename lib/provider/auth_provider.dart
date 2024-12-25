@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 class AuthProvider extends ChangeNotifier {
   bool _isSignedIn = false;
   String? _token;
-
   bool get isSignedIn => _isSignedIn;
+  get isLoading => null;
 
   Future<void> login(String email, String password) async {
-    const String loginUrl = 'https://reqres.in/api/login';
+    const String loginUrl = '';
 
     try {
       final response = await http.post(
