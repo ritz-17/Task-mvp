@@ -47,26 +47,26 @@ class _NavBarState extends State<NavBar> {
             ),
           ),
           child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
+            items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
-                activeIcon: Icon(Icons.home, color: Color.fromARGB(255, 122, 90, 248)),
+                activeIcon: Icon(Icons.home, color: Theme.of(context).primaryColor),
                 label: 'Dashboard',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.article),
-                activeIcon: Icon(Icons.article, color: Color.fromARGB(255, 122, 90, 248)),
+                activeIcon: Icon(Icons.article, color: Theme.of(context).primaryColor),
                 label: 'Task',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),
-                activeIcon: Icon(Icons.person, color: Color.fromARGB(255, 122, 90, 248)),
+                activeIcon: Icon(Icons.person, color: Theme.of(context).primaryColor),
                 label: 'Profile',
               ),
             ],
             currentIndex: _selectedIndex,
             elevation: 0,
-            selectedItemColor: const Color.fromARGB(255, 122, 90, 248),
+            selectedItemColor: Theme.of(context).primaryColor,
             unselectedItemColor: Colors.grey.shade400,
             showSelectedLabels: true,
             showUnselectedLabels: false,

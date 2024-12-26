@@ -172,17 +172,38 @@ class TaskData {
   });
 }
 
-Future<File?> pickImage(BuildContext context) async {
+
+Future<void> pickImage({
+  required BuildContext context,
+  required int index,
+  required List<File?> selectedImages,
+  required List<bool> isUploading,
+  required Function updateState,
+}) async {
   File? image;
   try {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
+      updateState(() {
+        isUploading[index] = true; // Start upload animation
+      });
+
+      // Simulate upload delay
+      await Future.delayed(const Duration(seconds: 2));
+
       image = File(pickedImage.path);
+
+      updateState(() {
+        selectedImages[index] = image;
+        isUploading[index] = false; // End upload animation
+      });
     }
   } catch (e) {
-    showSnackBar(context, e.toString());
+    updateState(() {
+      isUploading[index] = false; // End upload animation in case of error
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error picking image: ${e.toString()}")),
+    );
   }
-
-  return image;
 }

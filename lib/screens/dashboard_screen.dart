@@ -140,7 +140,7 @@ class DashboardScreen extends StatelessWidget {
             ),
           );
         },
-        backgroundColor: Color.fromARGB(255, 122, 90, 248),
+        backgroundColor: Theme.of(context).primaryColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
         ),
