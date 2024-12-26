@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:task_mvp/provider/auth_provider.dart';
+import 'package:task_mvp/screens/login_screen.dart';
+import 'package:task_mvp/screens/verified_screen.dart';
 import 'package:task_mvp/screens/splashScreen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
+
+import 'screens/verification_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,11 +29,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Task App',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 122, 90, 248),),
-
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Color.fromARGB(255, 122, 90, 248),
+          ),
           useMaterial3: true,
         ),
-        home: SplashScreen(),
+        home: VerificationPage(),
       ),
     );
   }

@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
           builder: (context) =>
-          isSignedIn ? const NavBar() : const SignupScreen(),
+              isSignedIn ? const NavBar() : const SignupPage(),
         ),
       );
     }
@@ -78,8 +78,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     scale: _logoScale,
                     duration: const Duration(milliseconds: 750),
                     curve: Curves.easeInOut,
-                    child:
-                    const Icon(Icons.shopping_cart, color: Colors.white, size: 100),
+                    child: const Icon(Icons.shopping_cart,
+                        color: Colors.white, size: 100),
                   ),
                   const SizedBox(height: 20),
                   const Text(

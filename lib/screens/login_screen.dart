@@ -3,14 +3,14 @@ import '../utils/login_text_field.dart';
 import '../utils/password_text_field.dart';
 import 'dashboard_screen.dart';
 
-class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
-  State<SignupPage> createState() => _SignupPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -41,27 +41,10 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 SizedBox(height: 40),
 
-                //---------------Create your Account -------------------------
+                //---------------Login to your Account -------------------------
                 Text(
-                  "Create your account",
+                  "Login to your account",
                   style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 10),
-
-                //-------------------- Username -----------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: LoginTextField(
-                    controller: emailController,
-                    hintText: 'Username',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter username';
-                      }
-                      // Add more email validation logic here
-                      return null;
-                    },
-                  ),
                 ),
                 SizedBox(height: 10),
 
@@ -99,24 +82,23 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 SizedBox(height: 5),
 
-                //------------------ Confirm PassWord Field --------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: PasswordTextField(
-                    controller: passwordController,
-                    hintText: 'Confirm Password',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      // Add more password validation logic here
-                      return null;
-                    },
+                //--------------------- Forgot Password? -----------------------
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 35.0),
+                    child: Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
 
-                //-------------------- Register Button ----------------------------
+                //-------------------- Lpgin Button ----------------------------
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: ElevatedButton(
@@ -144,7 +126,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                     ),
                     child: const Text(
-                      "Register",
+                      "Login",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -155,9 +137,9 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 SizedBox(height: 20),
 
-                // ---------------- Or Register With ------------------------------
+                // ---------------- Or Login With ------------------------------
                 Text(
-                  "-- Or Register With --",
+                  "-- Or Login With --",
                   style: TextStyle(color: Colors.grey),
                 ),
                 SizedBox(height: 20),
@@ -187,6 +169,23 @@ class _SignupPageState extends State<SignupPage> {
                   ],
                 ),
                 SizedBox(height: 20),
+
+                // ------------- Don't Have An Account -------------------------
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to the signup screen
+                      },
+                      child: const Text(
+                        "SignUp",
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
