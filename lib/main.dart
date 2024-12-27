@@ -7,6 +7,7 @@ import 'package:task_mvp/screens/verified_screen.dart';
 import 'package:task_mvp/screens/splashScreen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 
+import 'screens/signup_screen.dart';
 import 'screens/verification_screen.dart';
 
 void main() async {
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: VerificationPage(),
+        home: SignupPage(),
       ),
     );
   }

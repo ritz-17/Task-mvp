@@ -24,7 +24,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   "TASK-WAN",
                   style: TextStyle(
                     fontSize: 35,
-                    color: Colors.lightBlue,
+                    color: Color.fromARGB(255, 122, 90, 248),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -85,7 +85,7 @@ class _VerificationPageState extends State<VerificationPage> {
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
+                      backgroundColor: Color.fromARGB(255, 122, 90, 248),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

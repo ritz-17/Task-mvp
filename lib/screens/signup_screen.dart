@@ -29,7 +29,7 @@ class _SignupPageState extends State<SignupPage> {
                   "TASK-WAN",
                   style: TextStyle(
                     fontSize: 35,
-                    color: Colors.lightBlue,
+                    color: Color.fromARGB(255, 122, 90, 248),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -114,7 +114,7 @@ class _SignupPageState extends State<SignupPage> {
                     },
                   ),
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: 10),
 
                 //-------------------- Register Button ----------------------------
                 SizedBox(
@@ -138,7 +138,7 @@ class _SignupPageState extends State<SignupPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
+                      backgroundColor: Color.fromARGB(255, 122, 90, 248),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

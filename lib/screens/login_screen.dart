@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
                   "TASK-WAN",
                   style: TextStyle(
                     fontSize: 35,
-                    color: Colors.lightBlue,
+                    color: Color.fromARGB(255, 122, 90, 248),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       "Forgot Password?",
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: Color.fromARGB(255, 122, 90, 248),
                         fontSize: 14,
                       ),
                     ),
@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue,
+                      backgroundColor: Color.fromARGB(255, 122, 90, 248),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
