@@ -1,7 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_mvp/screens/signup_screen.dart';
+import 'package:task_mvp/screens/register_screen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 
 import '../provider/auth_provider.dart';
@@ -46,7 +47,11 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
           builder: (context) =>
+<<<<<<< HEAD
               isSignedIn ? const NavBar() : const SignupPage(),
+=======
+              isSignedIn ? const NavBar() : const RegisterScreen(),
+>>>>>>> master
         ),
       );
     }

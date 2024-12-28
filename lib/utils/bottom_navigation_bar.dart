@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_mvp/screens/task_screen.dart';
+
 import '../screens/dashboard_screen.dart';
+import '../screens/employeeList_screen.dart';
 import '../screens/profile_screen.dart';
 
 class NavBar extends StatefulWidget {
@@ -15,6 +17,7 @@ class _NavBarState extends State<NavBar> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
+    EmployeeScreen(),
     TaskScreen(),
     ProfileScreen(),
   ];
@@ -27,50 +30,62 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: PhysicalModel(
-          color: Colors.transparent,
-          elevation: 8,
-          borderRadius: BorderRadius.circular(30),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 122, 90, 248),
-              // color: Color.fromRGBO(122, 90, 248, 100),
-              borderRadius: BorderRadius.circular(30),
+      bottomNavigationBar: PhysicalModel(
+        color: Colors.transparent,
+        elevation: 8,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(30),
+        ),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 249, 250, 251),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
             ),
-            child: BottomNavigationBar(
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home),
-                  activeIcon: Icon(Icons.home, color: Colors.white),
-                  label: 'Dashboard',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.article),
-                  activeIcon: Icon(Icons.article, color: Colors.white),
-                  label: 'Task',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  activeIcon: Icon(Icons.person, color: Colors.white),
-                  label: 'Profile',
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              elevation: 0,
-              selectedItemColor: Color.fromARGB(255, 249, 250, 251),
-              unselectedItemColor: Color.fromARGB(200, 241, 243, 248),
-              showSelectedLabels: true,
-              showUnselectedLabels: false,
-              backgroundColor: Colors.transparent,
-              type: BottomNavigationBarType.fixed,
-              onTap: _onItemTapped,
-            ),
+          ),
+          child: BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                activeIcon:
+                    Icon(Icons.home, color: Theme.of(context).primaryColor),
+                label: 'Dashboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.people_alt_outlined),
+                activeIcon: Icon(Icons.people_alt_rounded,
+                    color: Theme.of(context).primaryColor),
+                label: 'Employees',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.article),
+                activeIcon:
+                    Icon(Icons.article, color: Theme.of(context).primaryColor),
+                label: 'Task',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                activeIcon:
+                    Icon(Icons.person, color: Theme.of(context).primaryColor),
+                label: 'Profile',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            elevation: 0,
+            selectedItemColor: Theme.of(context).primaryColor,
+            unselectedItemColor: Colors.grey.shade400,
+            showSelectedLabels: true,
+            showUnselectedLabels: false,
+            backgroundColor: Colors.transparent,
+            type: BottomNavigationBarType.fixed,
+            onTap: _onItemTapped,
           ),
         ),
       ),

@@ -10,6 +10,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -93,6 +94,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ],
         ),
+=======
+    return  Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Text('Profile Screen'),
+          )
+        ],
+>>>>>>> master
       ),
     );
   }
