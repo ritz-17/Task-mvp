@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_mvp/screens/task_screen.dart';
+
 import '../screens/dashboard_screen.dart';
+import '../screens/employeeList_screen.dart';
 import '../screens/profile_screen.dart';
 
 class NavBar extends StatefulWidget {
@@ -15,6 +17,7 @@ class _NavBarState extends State<NavBar> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
+    EmployeeScreen(),
     TaskScreen(),
     ProfileScreen(),
   ];
@@ -27,6 +30,7 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
@@ -47,26 +51,35 @@ class _NavBarState extends State<NavBar> {
             ),
           ),
           child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
+            items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
-                activeIcon: Icon(Icons.home, color: Color.fromARGB(255, 122, 90, 248)),
+                activeIcon:
+                    Icon(Icons.home, color: Theme.of(context).primaryColor),
                 label: 'Dashboard',
               ),
               BottomNavigationBarItem(
+                icon: Icon(Icons.people_alt_outlined),
+                activeIcon: Icon(Icons.people_alt_rounded,
+                    color: Theme.of(context).primaryColor),
+                label: 'Employees',
+              ),
+              BottomNavigationBarItem(
                 icon: Icon(Icons.article),
-                activeIcon: Icon(Icons.article, color: Color.fromARGB(255, 122, 90, 248)),
+                activeIcon:
+                    Icon(Icons.article, color: Theme.of(context).primaryColor),
                 label: 'Task',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),
-                activeIcon: Icon(Icons.person, color: Color.fromARGB(255, 122, 90, 248)),
+                activeIcon:
+                    Icon(Icons.person, color: Theme.of(context).primaryColor),
                 label: 'Profile',
               ),
             ],
             currentIndex: _selectedIndex,
             elevation: 0,
-            selectedItemColor: const Color.fromARGB(255, 122, 90, 248),
+            selectedItemColor: Theme.of(context).primaryColor,
             unselectedItemColor: Colors.grey.shade400,
             showSelectedLabels: true,
             showUnselectedLabels: false,
