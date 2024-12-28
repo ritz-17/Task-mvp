@@ -172,8 +172,61 @@ class TaskData {
   });
 }
 
-
 Future<void> pickImage({
+  required BuildContext context,
+  required int index,
+  required List<File?> selectedImages,
+  required List<bool> isUploading,
+  required Function updateState,
+}) async {
+  await showModalBottomSheet(
+    context: context,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (context) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading:
+                Icon(Icons.camera_alt, color: Theme.of(context).primaryColor),
+            title: Text('Take Photo'),
+            onTap: () async {
+              Navigator.pop(context); // Close the bottom sheet
+              await _processImage(
+                source: ImageSource.camera,
+                context: context,
+                index: index,
+                selectedImages: selectedImages,
+                isUploading: isUploading,
+                updateState: updateState,
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.photo, color: Theme.of(context).primaryColor),
+            title: Text('Choose from Gallery'),
+            onTap: () async {
+              Navigator.pop(context);
+              await _processImage(
+                source: ImageSource.gallery,
+                context: context,
+                index: index,
+                selectedImages: selectedImages,
+                isUploading: isUploading,
+                updateState: updateState,
+              );
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<void> _processImage({
+  required ImageSource source,
   required BuildContext context,
   required int index,
   required List<File?> selectedImages,
@@ -182,7 +235,7 @@ Future<void> pickImage({
 }) async {
   File? image;
   try {
-    final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedImage = await ImagePicker().pickImage(source: source);
     if (pickedImage != null) {
       updateState(() {
         isUploading[index] = true; // Start upload animation

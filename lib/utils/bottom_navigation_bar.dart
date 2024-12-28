@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:task_mvp/screens/task_screen.dart';
+
 import '../screens/dashboard_screen.dart';
+import '../screens/employeeList_screen.dart';
 import '../screens/profile_screen.dart';
 
 class NavBar extends StatefulWidget {
@@ -15,6 +17,7 @@ class _NavBarState extends State<NavBar> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
+    EmployeeScreen(),
     TaskScreen(),
     ProfileScreen(),
   ];
@@ -27,6 +30,7 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
@@ -50,17 +54,26 @@ class _NavBarState extends State<NavBar> {
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
-                activeIcon: Icon(Icons.home, color: Theme.of(context).primaryColor),
+                activeIcon:
+                    Icon(Icons.home, color: Theme.of(context).primaryColor),
                 label: 'Dashboard',
               ),
               BottomNavigationBarItem(
+                icon: Icon(Icons.people_alt_outlined),
+                activeIcon: Icon(Icons.people_alt_rounded,
+                    color: Theme.of(context).primaryColor),
+                label: 'Employees',
+              ),
+              BottomNavigationBarItem(
                 icon: Icon(Icons.article),
-                activeIcon: Icon(Icons.article, color: Theme.of(context).primaryColor),
+                activeIcon:
+                    Icon(Icons.article, color: Theme.of(context).primaryColor),
                 label: 'Task',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),
-                activeIcon: Icon(Icons.person, color: Theme.of(context).primaryColor),
+                activeIcon:
+                    Icon(Icons.person, color: Theme.of(context).primaryColor),
                 label: 'Profile',
               ),
             ],

@@ -208,6 +208,7 @@ class _CreateTaskState extends State<CreateTask> {
                         ))
                     .toList(),
               ),
+
               SizedBox(height: screenHeight * 0.03),
 
               // Create Task Button
@@ -285,6 +286,17 @@ class _CreateTaskState extends State<CreateTask> {
               ),
             ],
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Theme.of(context).primaryColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Icon(
+          Icons.mic,
+          color: Colors.white,
         ),
       ),
     );
