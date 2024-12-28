@@ -16,10 +16,6 @@ import 'screens/verification_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-<<<<<<< HEAD
-  runApp(
-    MultiProvider(
-=======
   runApp(const MyApp());
 }
 
@@ -29,7 +25,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
->>>>>>> master
       providers: [
         ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
         ChangeNotifierProvider<TimerProvider>(create: (_) => TimerProvider()),
@@ -38,20 +33,11 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Task App',
         theme: ThemeData(
-<<<<<<< HEAD
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Color.fromARGB(255, 122, 90, 248),
-          ),
-          useMaterial3: true,
-        ),
-        home: ProfileScreen(),
-=======
           primaryColor: const Color.fromARGB(255, 122, 90, 248),
           useMaterial3: true,
         ),
         home: const SplashScreen(),
->>>>>>> master
       ),
-    ),
-  );
+    );
+  }
 }

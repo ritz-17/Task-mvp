@@ -10,9 +10,10 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     return Scaffold(
       extendBodyBehindAppBar: true,
+
+      //------------------------------ App Bar ---------------------------------
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -22,7 +23,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.white,
+              ))
+        ],
       ),
+
+      // ------------------------------- body ----------------------------------
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -41,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             const SizedBox(height: 125),
 
-            // Profile Picture
+            //-------------------------- Profile Picture -----------------------
             CircleAvatar(
               radius: 60,
               backgroundImage: NetworkImage(
@@ -50,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Name
+            //------------------------------ Name ------------------------------
             const Text(
               'Mayur Srivastav',
               style: TextStyle(
@@ -60,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            // Designation
+            //--------------------------- Designation --------------------------
             const Text(
               'Manager',
               style: TextStyle(
@@ -68,42 +79,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.white70,
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
-            // Buttons
-            ElevatedButton(
-              onPressed: () {
-                // Add your edit profile logic here
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            //-------------------------- Email ---------------------------------
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Email: ',
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.bold),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              ),
-              child: const Text(
-                'Edit Profile',
-                style: TextStyle(
-                  color: Color.fromARGB(255, 100, 75, 255),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                const Text(
+                  'abccd@gmail.com',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white70,
+                  ),
                 ),
-              ),
-            ),
+              ],
+            )
           ],
         ),
-=======
-    return  Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Text('Profile Screen'),
-          )
-        ],
->>>>>>> master
       ),
     );
   }
