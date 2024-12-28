@@ -25,7 +25,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: const Text("Logout"),
+                          content:
+                              const Text("Are you sure you want to logout?"),
+                          actions: [
+                            TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("Cancel")),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pushReplacementNamed(
+                                      context, '/login');
+                                },
+                                child: Text(
+                                  "Logout",
+                                  style: TextStyle(color: Colors.red),
+                                ))
+                          ],
+                        ));
+              },
               icon: const Icon(
                 Icons.logout,
                 color: Colors.white,
