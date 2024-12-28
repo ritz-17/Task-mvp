@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:task_mvp/provider/auth_provider.dart';
 import 'package:task_mvp/provider/timer_provider.dart'; // Import TimerProvider
 import 'package:task_mvp/screens/login_screen.dart';
+import 'package:task_mvp/screens/profile_screen.dart';
 import 'package:task_mvp/screens/verified_screen.dart';
 import 'package:task_mvp/screens/splashScreen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
@@ -20,7 +21,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
-        ChangeNotifierProvider<TimerProvider>(create: (_) => TimerProvider()), 
+        ChangeNotifierProvider<TimerProvider>(create: (_) => TimerProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -31,7 +32,7 @@ void main() async {
           ),
           useMaterial3: true,
         ),
-        home: EmployeeTaskPage(),
+        home: ProfileScreen(),
       ),
     ),
   );
