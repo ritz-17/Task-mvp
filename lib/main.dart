@@ -20,7 +20,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
-        ChangeNotifierProvider<TimerProvider>(create: (_) => TimerProvider()), // Add TimerProvider
+        ChangeNotifierProvider<TimerProvider>(create: (_) => TimerProvider()), 
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

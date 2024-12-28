@@ -5,7 +5,7 @@ import 'package:task_mvp/utils/task_list_tile.dart';
 import 'task_detail_screen.dart';
 
 class EmployeeTaskPage extends StatefulWidget {
-  const EmployeeTaskPage({Key? key}) : super(key: key);
+  const EmployeeTaskPage({super.key});
 
   @override
   State<EmployeeTaskPage> createState() => _EmployeeTaskPageState();
