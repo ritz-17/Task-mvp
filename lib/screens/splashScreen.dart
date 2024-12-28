@@ -1,7 +1,8 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_mvp/screens/signup_screen.dart';
+import 'package:task_mvp/screens/register_screen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 
 import '../provider/auth_provider.dart';
@@ -46,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
           builder: (context) =>
-          isSignedIn ? const NavBar() : const SignupScreen(),
+              isSignedIn ? const NavBar() : const RegisterScreen(),
         ),
       );
     }
@@ -78,8 +79,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     scale: _logoScale,
                     duration: const Duration(milliseconds: 750),
                     curve: Curves.easeInOut,
-                    child:
-                    const Icon(Icons.shopping_cart, color: Colors.white, size: 100),
+                    child: const Icon(Icons.shopping_cart,
+                        color: Colors.white, size: 100),
                   ),
                   const SizedBox(height: 20),
                   const Text(
