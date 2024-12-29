@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 
+import '../provider/auth_provider.dart';
 import '../utils/login_text_field.dart';
 import '../utils/password_text_field.dart';
+import '../utils/utils.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,177 +15,214 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                //------------------- Task-Wan ---------------------------------
+                // ------------------ Task-Wan ---------------------------------
                 Text(
                   "TASK-WAN",
                   style: TextStyle(
-                    fontSize: 35,
-                    color: Color.fromARGB(255, 122, 90, 248),
+                    fontSize: screenWidth * 0.09,
+                    color: Theme.of(context).primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
 
-                //------------------- Management App ---------------------------
+                // ------------------ Management App ---------------------------
                 Text(
                   "Management App",
-                  style: TextStyle(color: Colors.grey, fontSize: 19),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: screenWidth * 0.045,
+                  ),
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: screenHeight * 0.05),
 
-                //---------------Login to your Account -------------------------
+                // ----------------- Login to Your Account ---------------------
                 Text(
-                  "Login to your account",
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 10),
-
-                //-------------------- Login Field -----------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: LoginTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      // Add more email validation logic here
-                      return null;
-                    },
+                  "Login to your Account",
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.05,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: screenHeight * 0.02),
 
-                //--------------------- PassWord Field -------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: PasswordTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      // Add more password validation logic here
-                      return null;
-                    },
-                  ),
+                // -------------------- Login Field ----------------------------
+                LoginTextField(
+                  controller: emailController,
+                  hintText: 'Email',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    return null;
+                  },
                 ),
-                SizedBox(height: 5),
+                SizedBox(height: screenHeight * 0.015),
 
-                //--------------------- Forgot Password? -----------------------
+                // ------------------ Password Field ---------------------------
+                PasswordTextField(
+                  controller: passwordController,
+                  hintText: 'Password',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: screenHeight * 0.01),
+
+                // ---------------- Forgot Password ----------------------------
                 Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: const EdgeInsets.only(right: 35.0),
+                    padding: EdgeInsets.only(right: screenWidth * 0.04),
                     child: Text(
                       "Forgot Password?",
                       style: TextStyle(
-                        color: Color.fromARGB(255, 122, 90, 248),
-                        fontSize: 14,
+                        color: Theme.of(context).primaryColor,
+                        fontSize: screenWidth * 0.035,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: screenHeight * 0.02),
 
-                //-------------------- Login Button ----------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // String email = emailController.text;
-                        // String password = passwordController.text;
-
-                        // Perform login logic here (e.g., API call)
-                        // ...
-
-                        // Navigate to the next screen on successful login
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => NavBar(),
-                          ),
-                        );
+                // ------------------ Login Button -----------------------------
+                Center(
+                  child: isLoading
+                      ? CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor)
+                      : ElevatedButton(
+                    onPressed: () async {
+                      if (emailController.text.isEmpty ||
+                          passwordController.text.isEmpty) {
+                        showSnackBar(
+                            context, 'Please enter email and password');
+                      } else {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        try {
+                          await Provider.of<AuthProvider>(context,
+                              listen: false)
+                              .login(emailController.text, "password",
+                              passwordController.text);
+                          showSnackBar(context, 'Login Successful');
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const NavBar()),
+                          );
+                        } catch (e) {
+                          showSnackBar(
+                              context, 'Login failed: ${e.toString()}');
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 122, 90, 248),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                      backgroundColor: Theme.of(context).primaryColor,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: screenWidth * 0.2,
+                        vertical: screenHeight * 0.02,
                       ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 5,
                     ),
-                    child: const Text(
-                      "Login",
+                    child: Text(
+                      'Login',
                       style: TextStyle(
+                        fontSize: screenWidth * 0.045,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.03),
 
-                // ---------------- Or Login With ------------------------------
+                // ------------------ Or Login With ----------------------------
                 Text(
                   "-- Or Login With --",
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: screenWidth * 0.04,
+                  ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.03),
 
-                // ------------------------ Logo -------------------------------
+                // ---------------------- Logo ---------------------------------
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Use Image.asset for displaying images
                     Image.asset(
                       'assets/google_logo.png',
-                      width: 40,
-                      height: 40,
+                      width: screenWidth * 0.1,
+                      height: screenWidth * 0.1,
                     ),
-                    SizedBox(width: 60),
+                    SizedBox(width: screenWidth * 0.15),
                     Image.asset(
                       'assets/facebook_logo.png',
-                      width: 40,
-                      height: 40,
+                      width: screenWidth * 0.1,
+                      height: screenWidth * 0.1,
                     ),
-                    SizedBox(width: 60),
+                    SizedBox(width: screenWidth * 0.15),
                     Image.asset(
                       'assets/twitter_logo.png',
-                      width: 40,
-                      height: 40,
+                      width: screenWidth * 0.1,
+                      height: screenWidth * 0.1,
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: screenHeight * 0.03),
 
-                // ------------- Don't Have An Account -------------------------
+                // ---------------- Don't Have An Account ----------------------
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?"),
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(fontSize: screenWidth * 0.04),
+                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/signup');
                       },
-                      child: const Text(
+                      child: Text(
                         "SignUp",
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: screenWidth * 0.045,
+                        ),
                       ),
                     ),
                   ],

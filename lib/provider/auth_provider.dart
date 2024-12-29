@@ -13,8 +13,60 @@ class AuthProvider extends ChangeNotifier {
 
   get isLoading => null;
 
-  Future<void> login(
-      String email, String mobile, String type, String password) async {
+  // ------------manager register-------------
+  Future<void> register(String email, String phone, String firstName,
+      String lastName, String type, String password) async {
+    String registerUrl = '${baseURl}manager/register';
+
+    try {
+      final response = await http.post(
+        Uri.parse(registerUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'user': {
+            'email': email,
+            'phone': phone,
+            'firstName': firstName,
+            'lastName': lastName,
+            'auth': {
+              'type': type,
+              'data': {
+                'password': password,
+              },
+            },
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Check for a success message
+        if (data['message'] == "User successfully registered.") {
+          // Store user state or navigate as needed
+          final box = await Hive.openBox('authBox');
+          await box.put('isSignedIn', true);
+          _isSignedIn = true;
+          notifyListeners();
+
+          print('Registration successful');
+        } else {
+          throw Exception('Unexpected success message: ${data['message']}');
+        }
+      } else {
+        // Handle errors from the API
+        final errorData = jsonDecode(response.body);
+        throw Exception(
+            'Registration failed: ${errorData['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      print('Error in registration: $e');
+      throw Exception('Registration error: ${e.toString()}');
+    }
+  }
+
+  // ------------manager login-------------
+  Future<void> login(String email, String type, String password) async {
     String loginUrl = '${baseURl}manager/login';
 
     try {
@@ -24,7 +76,6 @@ class AuthProvider extends ChangeNotifier {
         body: jsonEncode({
           'user': {
             'email': email,
-            'phone': mobile,
             'auth': {
               'type': type,
               'data': {
@@ -59,7 +110,6 @@ class AuthProvider extends ChangeNotifier {
       print('Error in login: $e');
       throw Exception('Login error: ${e.toString()}');
     }
-    notifyListeners();
   }
 
   Future<void> getDataFromHive() async {

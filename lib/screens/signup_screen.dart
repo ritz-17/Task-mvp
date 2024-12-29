@@ -19,7 +19,20 @@ class _SignupPageState extends State<SignupPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final phoneController = TextEditingController();
+  final fNameController = TextEditingController();
+  final lNameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    phoneController.dispose();
+    fNameController.dispose();
+    lNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,187 +45,220 @@ class _SignupPageState extends State<SignupPage> {
           child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  //------------------- Task-Wan Logo --------------------------
-                  Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          "TASK-WAN",
-                          style: TextStyle(
-                            fontSize: 35,
-                            color: Theme.of(context).primaryColor,
-                            fontWeight: FontWeight.bold,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //------------------- Task-Wan Logo ------------------------
+                    Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            "TASK-WAN",
+                            style: TextStyle(
+                              fontSize: 35,
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          Text(
+                            "Management App",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 19,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+
+                    //------------------- Create Your Account ------------------
+                    Center(
+                      child: Text(
+                        "Create your account",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
                         ),
-                        Text(
-                          "Management App",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 19,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    //------------------- First Name Field ---------------------
+                    TextFormField(
+                      controller: fNameController,
+                      decoration: const InputDecoration(
+                        hintText: 'First Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your First Name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    //------------------- Last Name Field ----------------------
+                    TextFormField(
+                      controller: lNameController,
+                      decoration: const InputDecoration(
+                        hintText: 'Last Name',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your Last Name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    //------------------- Email Field --------------------------
+                    LoginTextField(
+                      controller: emailController,
+                      hintText: 'Email',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    //------------------- Phone Field --------------------------
+                    PhoneNumberField(
+                      controller: phoneController,
+                      hintText: 'Phone Number',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number';
+                        } else if (value.length != 10) {
+                          return 'Phone number must be 10 digits';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+
+                    //------------------- Password Field -----------------------
+                    PasswordTextField(
+                      controller: passwordController,
+                      hintText: 'Password',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+
+                    //------------------- Signup Button ------------------------
+                    Center(
+                      child: isLoading
+                          ? CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor)
+                          : ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  try {
+                                    await Provider.of<AuthProvider>(context,
+                                            listen: false)
+                                        .register(
+                                            emailController.text,
+                                            phoneController.text,
+                                            fNameController.text,
+                                            lNameController.text,
+                                            "password",
+                                            passwordController.text);
+                                    showSnackBar(context, 'Signup Successful');
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => const NavBar()),
+                                    );
+                                  } catch (e) {
+                                    showSnackBar(context,
+                                        'Signup failed: ${e.toString()}');
+                                  } finally {
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).primaryColor,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.2,
+                                  vertical: screenHeight * 0.02,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 5,
+                              ),
+                              child: const Text(
+                                'Signup',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                    ),
+                    SizedBox(height: screenHeight * 0.04),
+
+                    //------------------- Social Login -------------------------
+                    Center(
+                      child: Text(
+                        "-- Or Register With --",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset('assets/google_logo.png', width: 40),
+                        SizedBox(width: screenWidth * 0.1),
+                        Image.asset('assets/facebook_logo.png', width: 40),
+                        SizedBox(width: screenWidth * 0.1),
+                        Image.asset('assets/twitter_logo.png', width: 40),
+                      ],
+                    ),
+
+                    SizedBox(height: screenHeight * 0.02),
+
+                    //----------------- Already Have Account -------------------
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text("Already have an account?"),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, '/login');
+                          },
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(color: Colors.blue),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(height: screenHeight * 0.04),
-
-                  //------------------- Create Your Account --------------------
-                  Center(
-                    child: Text(
-                      "Create your account",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-
-                  //------------------- Email Field ----------------------------
-                  LoginTextField(
-                    controller: emailController,
-                    hintText: 'Email',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your email';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-
-                  //------------------- Phone Field ----------------------------
-                  PhoneNumberField(
-                    controller: phoneController,
-                    hintText: 'Phone Number',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
-                      } else if (value.length != 10) {
-                        return 'Phone number must be 10 digits';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-
-                  //------------------- Password Field -------------------------
-                  PasswordTextField(
-                    controller: passwordController,
-                    hintText: 'Password',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: screenHeight * 0.04),
-
-                  //------------------- Signup Button --------------------------
-                  Center(
-                    child: isLoading
-                        ? CircularProgressIndicator(
-                            color: Theme.of(context).primaryColor)
-                        : ElevatedButton(
-                            onPressed: () async {
-                              if (emailController.text.isEmpty ||
-                                  passwordController.text.isEmpty) {
-                                showSnackBar(
-                                    context, 'Please enter email and password');
-                              } else {
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                try {
-                                  await Provider.of<AuthProvider>(context,
-                                          listen: false)
-                                      .login(
-                                          emailController.text,
-                                          phoneController.text,
-                                          "password",
-                                          passwordController.text);
-                                  showSnackBar(context, 'Signup Successful');
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const NavBar()),
-                                  );
-                                } catch (e) {
-                                  showSnackBar(context,
-                                      'Signup failed: ${e.toString()}');
-                                } finally {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.2,
-                                vertical: screenHeight * 0.02,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              elevation: 5,
-                            ),
-                            child: Text(
-                              'Signup',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                  ),
-                  SizedBox(height: screenHeight * 0.04),
-
-                  //------------------- Social Login ---------------------------
-                  Center(
-                    child: Text(
-                      "-- Or Register With --",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/google_logo.png', width: 40),
-                      SizedBox(width: screenWidth * 0.1),
-                      Image.asset('assets/facebook_logo.png', width: 40),
-                      SizedBox(width: screenWidth * 0.1),
-                      Image.asset('assets/twitter_logo.png', width: 40),
-                    ],
-                  ),
-
-                  SizedBox(height: screenHeight * 0.02),
-
-                  // ------------- Don't Have An Account -------------------------
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Already have an account?"),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/login');
-                        },
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

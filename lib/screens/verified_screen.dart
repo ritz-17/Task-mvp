@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 import 'dashboard_screen.dart';
 
 class VerifiedPage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _VerifiedPageState extends State<VerifiedPage> {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => DashboardScreen()),
+                            builder: (context) => NavBar()),
                         (Route<dynamic> route) =>
                             false, 
                       );
