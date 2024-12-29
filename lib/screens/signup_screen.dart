@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/login_text_field.dart';
 import '../utils/password_text_field.dart';
+import '../utils/phone_number_field.dart';
 import 'dashboard_screen.dart';
 
 class SignupPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +67,7 @@ class _SignupPageState extends State<SignupPage> {
                 ),
                 SizedBox(height: 10),
 
-                //-------------------- Login Field -----------------------------
+                //-------------------- Email Field -----------------------------
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.9,
                   child: LoginTextField(
@@ -76,6 +78,23 @@ class _SignupPageState extends State<SignupPage> {
                         return 'Please enter your email';
                       }
                       // Add more email validation logic here
+                      return null;
+                    },
+                  ),
+                ),
+                SizedBox(height: 10),
+
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: PhoneNumberField(
+                    controller: phoneController,
+                    hintText: 'Phone Number',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number';
+                      } else if (value.length != 10) {
+                        return 'Phone number must be 10 digits';
+                      }
                       return null;
                     },
                   ),
