@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:task_mvp/utils/bottom_navigation_bar.dart';
+
 import '../utils/login_text_field.dart';
 import '../utils/password_text_field.dart';
-import 'dashboard_screen.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -98,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 10),
 
-                //-------------------- Lpgin Button ----------------------------
+                //-------------------- Login Button ----------------------------
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: ElevatedButton(
@@ -114,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DashboardScreen(),
+                            builder: (context) => NavBar(),
                           ),
                         );
                       }

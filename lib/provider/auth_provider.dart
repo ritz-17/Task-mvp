@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 class AuthProvider extends ChangeNotifier {
+  String baseURl = "https://backend.taskmaster.outlfy.com/";
   bool _isSignedIn = false;
   String? _token;
 
@@ -12,15 +13,26 @@ class AuthProvider extends ChangeNotifier {
 
   get isLoading => null;
 
-  Future<void> login(String mobile) async {
-    const String loginUrl = '';
+  Future<void> login(
+      String email, String mobile, String type, String password) async {
+    String loginUrl = '${baseURl}manager/login';
 
     try {
       final response = await http.post(
         Uri.parse(loginUrl),
-        body: {
-          'mobile': mobile,
-        },
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'user': {
+            'email': email,
+            'phone': mobile,
+            'auth': {
+              'type': type,
+              'data': {
+                'password': password,
+              },
+            },
+          },
+        }),
       );
 
       if (response.statusCode == 200) {
@@ -47,6 +59,7 @@ class AuthProvider extends ChangeNotifier {
       print('Error in login: $e');
       throw Exception('Login error: ${e.toString()}');
     }
+    notifyListeners();
   }
 
   Future<void> getDataFromHive() async {
@@ -69,6 +82,6 @@ class AuthProvider extends ChangeNotifier {
     _token = box.get('token');
     _isSignedIn = _token != null;
     notifyListeners();
-    return true; //changee this at lastttt
+    return _isSignedIn;
   }
 }

@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
           builder: (context) =>
-              isSignedIn ? const NavBar() : const SignupPage(),
+          isSignedIn ? const NavBar() : const SignupPage(),
         ),
       );
     }

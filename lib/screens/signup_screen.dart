@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_mvp/utils/bottom_navigation_bar.dart';
+import 'package:task_mvp/utils/utils.dart';
+
+import '../provider/auth_provider.dart';
 import '../utils/login_text_field.dart';
 import '../utils/password_text_field.dart';
 import '../utils/phone_number_field.dart';
-import 'dashboard_screen.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -12,81 +16,78 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final phoneController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //------------------- Task-Wan ---------------------------------
-                Text(
-                  "TASK-WAN",
-                  style: TextStyle(
-                    fontSize: 35,
-                    color: Color.fromARGB(255, 122, 90, 248),
-                    fontWeight: FontWeight.bold,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //------------------- Task-Wan Logo --------------------------
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          "TASK-WAN",
+                          style: TextStyle(
+                            fontSize: 35,
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          "Management App",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 19,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                  SizedBox(height: screenHeight * 0.04),
 
-                //------------------- Management App ---------------------------
-                Text(
-                  "Management App",
-                  style: TextStyle(color: Colors.grey, fontSize: 19),
-                ),
-                SizedBox(height: 40),
-
-                //---------------Create your Account -------------------------
-                Text(
-                  "Create your account",
-                  style: TextStyle(fontSize: 16),
-                ),
-                SizedBox(height: 10),
-
-                //-------------------- Username -----------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: LoginTextField(
-                    controller: emailController,
-                    hintText: 'Username',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter username';
-                      }
-                      // Add more email validation logic here
-                      return null;
-                    },
+                  //------------------- Create Your Account --------------------
+                  Center(
+                    child: Text(
+                      "Create your account",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.02),
 
-                //-------------------- Email Field -----------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: LoginTextField(
+                  //------------------- Email Field ----------------------------
+                  LoginTextField(
                     controller: emailController,
                     hintText: 'Email',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your email';
                       }
-                      // Add more email validation logic here
                       return null;
                     },
                   ),
-                ),
-                SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.02),
 
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: PhoneNumberField(
+                  //------------------- Phone Field ----------------------------
+                  PhoneNumberField(
                     controller: phoneController,
                     hintText: 'Phone Number',
                     validator: (value) {
@@ -98,115 +99,121 @@ class _SignupPageState extends State<SignupPage> {
                       return null;
                     },
                   ),
-                ),
-                SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.02),
 
-                //--------------------- PassWord Field -------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: PasswordTextField(
+                  //------------------- Password Field -------------------------
+                  PasswordTextField(
                     controller: passwordController,
                     hintText: 'Password',
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
                       }
-                      // Add more password validation logic here
                       return null;
                     },
                   ),
-                ),
-                SizedBox(height: 5),
+                  SizedBox(height: screenHeight * 0.04),
 
-                //------------------ Confirm PassWord Field --------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: PasswordTextField(
-                    controller: passwordController,
-                    hintText: 'Confirm Password',
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
-                      }
-                      // Add more password validation logic here
-                      return null;
-                    },
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                //-------------------- Register Button ----------------------------
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // String email = emailController.text;
-                        // String password = passwordController.text;
-
-                        // Perform login logic here (e.g., API call)
-                        // ...
-
-                        // Navigate to the next screen on successful login
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DashboardScreen(),
+                  //------------------- Signup Button --------------------------
+                  Center(
+                    child: isLoading
+                        ? CircularProgressIndicator(
+                            color: Theme.of(context).primaryColor)
+                        : ElevatedButton(
+                            onPressed: () async {
+                              if (emailController.text.isEmpty ||
+                                  passwordController.text.isEmpty) {
+                                showSnackBar(
+                                    context, 'Please enter email and password');
+                              } else {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                try {
+                                  await Provider.of<AuthProvider>(context,
+                                          listen: false)
+                                      .login(
+                                          emailController.text,
+                                          phoneController.text,
+                                          "password",
+                                          passwordController.text);
+                                  showSnackBar(context, 'Signup Successful');
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const NavBar()),
+                                  );
+                                } catch (e) {
+                                  showSnackBar(context,
+                                      'Signup failed: ${e.toString()}');
+                                } finally {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.2,
+                                vertical: screenHeight * 0.02,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 5,
+                            ),
+                            child: Text(
+                              'Signup',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color.fromARGB(255, 122, 90, 248),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      "Register",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+
+                  //------------------- Social Login ---------------------------
+                  Center(
+                    child: Text(
+                      "-- Or Register With --",
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset('assets/google_logo.png', width: 40),
+                      SizedBox(width: screenWidth * 0.1),
+                      Image.asset('assets/facebook_logo.png', width: 40),
+                      SizedBox(width: screenWidth * 0.1),
+                      Image.asset('assets/twitter_logo.png', width: 40),
+                    ],
+                  ),
 
-                // ---------------- Or Register With ------------------------------
-                Text(
-                  "-- Or Register With --",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.02),
 
-                // ------------------------ Logo -------------------------------
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Use Image.asset for displaying images
-                    Image.asset(
-                      'assets/google_logo.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                    SizedBox(width: 60),
-                    Image.asset(
-                      'assets/facebook_logo.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                    SizedBox(width: 60),
-                    Image.asset(
-                      'assets/twitter_logo.png',
-                      width: 40,
-                      height: 40,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-              ],
+                  // ------------- Don't Have An Account -------------------------
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Already have an account?"),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
