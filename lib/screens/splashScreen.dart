@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_mvp/screens/register_screen.dart';
 import 'package:task_mvp/screens/signup_screen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 

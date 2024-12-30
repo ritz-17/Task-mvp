@@ -12,7 +12,6 @@ import 'package:task_mvp/screens/splashScreen.dart';
 import 'package:task_mvp/screens/verification_screen.dart';
 import 'package:task_mvp/screens/verified_screen.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
