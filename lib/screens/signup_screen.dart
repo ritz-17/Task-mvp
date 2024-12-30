@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:task_mvp/utils/address_field.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
+import 'package:task_mvp/utils/dob_field.dart';
 import 'package:task_mvp/utils/utils.dart';
 
 import '../provider/auth_provider.dart';
@@ -21,6 +23,8 @@ class _SignupPageState extends State<SignupPage> {
   final phoneController = TextEditingController();
   final fNameController = TextEditingController();
   final lNameController = TextEditingController();
+  final DOBController = TextEditingController();
+  final addressController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
 
@@ -115,6 +119,17 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
+                      SizedBox(height: screenHeight * 0.015),
+
+                      //--------------------- DOB Field ------------------------
+
+                      DOBTextField(
+                          controller: DOBController, hintText: "Date of Birth"),
+                      SizedBox(height: screenHeight * 0.015),
+
+                      //--------------------- DOB Field ------------------------
+                      AddressTextField(
+                          controller: addressController, hintText: "Address"),
                       SizedBox(height: screenHeight * 0.015),
 
                       //------------------- Email Field --------------------------
