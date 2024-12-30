@@ -64,7 +64,7 @@ class _SignupPageState extends State<SignupPage> {
                             Text(
                               "TASK-WAN",
                               style: TextStyle(
-                                fontSize: 35,
+                                fontSize: 28,
                                 color: Theme.of(context).primaryColor,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -73,26 +73,26 @@ class _SignupPageState extends State<SignupPage> {
                               "Management App",
                               style: TextStyle(
                                 color: Colors.grey,
-                                fontSize: 19,
+                                fontSize: 16,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.03),
+                      SizedBox(height: screenHeight * 0.02),
 
                       //------------------- Create Your Account ------------------
                       Center(
                         child: Text(
                           "Create your account",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01),
 
                       //------------------- First Name Field ---------------------
                       LoginTextField(
@@ -105,7 +105,7 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01),
 
                       //------------------- Last Name Field ----------------------
 
@@ -119,20 +119,22 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01),
 
                       //--------------------- DOB Field ------------------------
 
                       DOBTextField(
                           controller: DOBController, hintText: "Date of Birth"),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01),
 
-                      //--------------------- DOB Field ------------------------
+                      //--------------------- Address Field ------------------------
+
                       AddressTextField(
                           controller: addressController, hintText: "Address"),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01),
 
                       //------------------- Email Field --------------------------
+
                       LoginTextField(
                         controller: emailController,
                         hintText: 'Email',
@@ -143,9 +145,10 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01),
 
                       //------------------- Phone Field --------------------------
+
                       PhoneNumberField(
                         controller: phoneController,
                         hintText: 'Phone Number',
@@ -158,9 +161,10 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: screenHeight * 0.015),
+                      SizedBox(height: screenHeight * 0.01), // Reduced height
 
                       //------------------- Password Field -----------------------
+
                       PasswordTextField(
                         controller: passwordController,
                         hintText: 'Password',
@@ -171,7 +175,7 @@ class _SignupPageState extends State<SignupPage> {
                           return null;
                         },
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: screenHeight * 0.015),
 
                       //------------------- Signup Button ------------------------
                       Center(
@@ -216,8 +220,8 @@ class _SignupPageState extends State<SignupPage> {
                                   backgroundColor:
                                       Theme.of(context).primaryColor,
                                   padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.2,
-                                    vertical: screenHeight * 0.02,
+                                    horizontal: screenWidth * 0.15,
+                                    vertical: screenHeight * 0.015,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
@@ -227,7 +231,7 @@ class _SignupPageState extends State<SignupPage> {
                                 child: const Text(
                                   'Signup',
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -239,35 +243,36 @@ class _SignupPageState extends State<SignupPage> {
                       Center(
                         child: Text(
                           "-- Or Register With --",
-                          style: TextStyle(color: Colors.grey),
+                          style: TextStyle(color: Colors.grey, fontSize: 12),
                         ),
                       ),
-                      // SizedBox(height: screenHeight * 0.01),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('assets/google_logo.png', width: 40),
-                          SizedBox(width: screenWidth * 0.1),
-                          Image.asset('assets/facebook_logo.png', width: 40),
-                          SizedBox(width: screenWidth * 0.1),
-                          Image.asset('assets/twitter_logo.png', width: 40),
+                          Image.asset('assets/google_logo.png', width: 30),
+                          SizedBox(width: screenWidth * 0.05),
+                          Image.asset('assets/facebook_logo.png', width: 30),
+                          SizedBox(width: screenWidth * 0.05),
+                          Image.asset('assets/twitter_logo.png', width: 30),
                         ],
                       ),
 
-                      SizedBox(height: screenHeight * 0.001),
+                      SizedBox(height: screenHeight * 0.0001),
 
                       //----------------- Already Have Account -------------------
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account?"),
+                          const Text("Already have an account?",
+                              style: TextStyle(fontSize: 12)),
                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/login');
                             },
                             child: const Text(
                               "Login",
-                              style: TextStyle(color: Colors.blue),
+                              style:
+                                  TextStyle(color: Colors.blue, fontSize: 12),
                             ),
                           ),
                         ],

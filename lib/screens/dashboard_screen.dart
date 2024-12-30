@@ -10,17 +10,13 @@ class DashboardScreen extends StatelessWidget {
     // Get screen dimensions
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
-    final double screenHeight = screenSize.height;
 
-    // Define responsive measurements
     final double paddingLarge = screenWidth * 0.05;
     final double paddingMedium = screenWidth * 0.03;
     final double paddingSmall = screenWidth * 0.02;
 
-    // Define responsive font sizes
     final double headerFontSize = screenWidth * 0.05;
     final double subheaderFontSize = screenWidth * 0.035;
-    final double bodyFontSize = screenWidth * 0.032;
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -36,6 +32,7 @@ class DashboardScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  //-------------------- Header Section ------------------------
                   _buildHeader(
                     context,
                     headerFontSize: headerFontSize,
@@ -44,6 +41,7 @@ class DashboardScreen extends StatelessWidget {
                     avatarRadius: screenWidth * 0.06,
                     iconSize: screenWidth * 0.06,
                   ),
+                  //--------------------- Summary Card -------------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: paddingMedium),
                     child: _buildSummaryCard(
@@ -54,6 +52,7 @@ class DashboardScreen extends StatelessWidget {
                       padding: paddingMedium,
                     ),
                   ),
+                  //---------------------- Team Section ------------------------
                   Padding(
                     padding: EdgeInsets.all(paddingSmall),
                     child: Card(
@@ -92,6 +91,9 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
       ),
+
+      
+      //---------------------- Floating Action Button --------------------------
       floatingActionButton: SizedBox(
         height: screenWidth * 0.14,
         width: screenWidth * 0.14,
@@ -118,6 +120,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  //--------------------------- Header Build Method ----------------------------
   Widget _buildHeader(
     BuildContext context, {
     required double headerFontSize,
@@ -131,6 +134,7 @@ class DashboardScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          //-------------------- Profile and Info ------------------------------
           Expanded(
             child: Row(
               children: [
@@ -176,6 +180,7 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+          //-------------------- Notification and Settings Icons ---------------
           Row(
             children: [
               IconButton(
@@ -197,6 +202,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  //------------------------ Summary Card Build Method -------------------------
   Widget _buildSummaryCard(
     BuildContext context, {
     required double titleSize,
@@ -216,6 +222,7 @@ class DashboardScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            //------------------------- Summary Text ---------------------------
             Expanded(
               flex: 3,
               child: Column(
@@ -240,6 +247,7 @@ class DashboardScreen extends StatelessWidget {
                 ],
               ),
             ),
+            //------------------------ Summary Image ---------------------------
             Expanded(
               flex: 1,
               child: Image.asset(

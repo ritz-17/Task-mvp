@@ -37,7 +37,8 @@ class DOBTextField extends StatelessWidget {
               );
 
               if (pickedDate != null) {
-                String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+                String formattedDate =
+                    DateFormat('yyyy-MM-dd').format(pickedDate);
                 controller.text = formattedDate;
               }
             },
@@ -45,6 +46,11 @@ class DOBTextField extends StatelessWidget {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: hintText,
+              suffixIcon: Icon(
+                Icons.calendar_today,
+                size: 20,
+                color: const Color.fromARGB(255, 122, 90, 248),
+              ),
             ),
           ),
         ),
