@@ -5,69 +5,108 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 
 class AuthProvider extends ChangeNotifier {
-  String baseURl = "https://backend.taskmaster.outlfy.com/";
+  // Box initialization
+  final Future<Box> _box = Hive.openBox('authBox');
+  final String baseUrl = "https://backend.taskmaster.outlfy.com/";
+
+  // Private fields
   bool _isSignedIn = false;
   String? _token;
+  String? _role;
 
+  // Public getters
   bool get isSignedIn => _isSignedIn;
 
-  get isLoading => null;
+  String? get token => _token;
 
-  // ------------manager register-------------
-  Future<void> register(String email, String phone, String firstName,
-      String lastName, String type, String password) async {
-    String registerUrl = '${baseURl}manager/register';
+  String? get role => _role;
+
+  // Setters
+  void setRole(String role) async {
+    _role = role;
+    final box = await _box;
+    await box.put('role', role); // Save role in Hive
+    notifyListeners();
+  }
+
+  Future<void> _updateHive(String key, dynamic value) async {
+    final box = await _box;
+    await box.put(key, value);
+  }
+
+  // Retrieve data from Hive
+  Future<void> initializeAuthState() async {
+    final box = await _box;
+    _isSignedIn = box.get('isSignedIn', defaultValue: false);
+    _token = box.get('token');
+    _role = box.get('role');
+    notifyListeners();
+  }
+
+  // Register method
+  Future<void> register(
+    String email,
+    String phone,
+    String firstName,
+    String lastName,
+    String type,
+    String password,
+    String dateOfBirth,
+    String address,
+  ) async {
+    final registerUrl = '$baseUrl$role/register';
 
     try {
+      final body = jsonEncode({
+        'user': {
+          'email': email,
+          'phone': phone,
+          'firstName': firstName,
+          'lastName': lastName,
+          'auth': {
+            'type': type,
+            'data': {
+              'password': password,
+            },
+          },
+        },
+        'data': {
+          'dateOfBirth': dateOfBirth,
+          'address': address,
+        },
+      });
+
       final response = await http.post(
         Uri.parse(registerUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'user': {
-            'email': email,
-            'phone': phone,
-            'firstName': firstName,
-            'lastName': lastName,
-            'auth': {
-              'type': type,
-              'data': {
-                'password': password,
-              },
-            },
-          },
-        }),
+        body: body,
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-        // Check for a success message
-        if (data['message'] == "User successfully registered.") {
-          // Store user state or navigate as needed
-          final box = await Hive.openBox('authBox');
-          await box.put('isSignedIn', true);
-          _isSignedIn = true;
-          notifyListeners();
-
-          print('Registration successful');
-        } else {
-          throw Exception('Unexpected success message: ${data['message']}');
-        }
+      if (response.statusCode == 200 &&
+          data['message'] == "User successfully registered.") {
+        await _updateHive('isSignedIn', true);
+        _isSignedIn = true;
+        notifyListeners();
+        print('Registration successful');
       } else {
-        // Handle errors from the API
-        final errorData = jsonDecode(response.body);
         throw Exception(
-            'Registration failed: ${errorData['error'] ?? 'Unknown error'}');
+            data['message'] ?? 'Unknown error during registration.');
       }
     } catch (e) {
-      print('Error in registration: $e');
-      throw Exception('Registration error: ${e.toString()}');
+      print('Registration error: $e');
+      throw Exception('Registration error: $e');
     }
   }
 
-  // ------------manager login-------------
-  Future<void> login(String email, String type, String password) async {
-    String loginUrl = '${baseURl}manager/login';
+  // Login method
+  Future<void> login(
+    String email,
+    String type,
+    String password,
+  ) async {
+    final loginUrl = '$baseUrl$role/login';
 
     try {
       final response = await http.post(
@@ -86,51 +125,42 @@ class AuthProvider extends ChangeNotifier {
         }),
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-        if (data['token'] != null) {
-          _token = data['token'];
+      if (response.statusCode == 200 && data['token'] != null) {
+        _token = data['token'];
+        await _updateHive('token', _token);
+        await _updateHive('isSignedIn', true);
 
-          final box = await Hive.openBox('authBox');
-          await box.put('token', _token);
-          await box.put('isSignedIn', true);
-
-          _isSignedIn = true;
-          notifyListeners();
-        } else {
-          throw Exception('Token not found in response.');
-        }
+        _isSignedIn = true;
+        notifyListeners();
+        print('Login successful');
       } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception(
-            'Login failed: ${errorData['error'] ?? 'Unknown error'}');
+        throw Exception(data['error'] ?? 'Unknown error during login.');
       }
     } catch (e) {
-      print('Error in login: $e');
-      throw Exception('Login error: ${e.toString()}');
+      print('Login error: $e');
+      throw Exception('Login error: $e');
     }
   }
 
-  Future<void> getDataFromHive() async {
-    final box = await Hive.openBox('authBox');
-    _isSignedIn = box.get('isSignedIn', defaultValue: false);
-    _token = box.get('token');
-    notifyListeners();
-  }
-
+  // Logout method
   Future<void> logout() async {
-    final box = await Hive.openBox('authBox');
+    final box = await _box;
     await box.delete('token');
     await box.put('isSignedIn', false);
     _isSignedIn = false;
+    _token = null;
+    _role = null;
     notifyListeners();
   }
 
+  // Check if user is signed in
   Future<bool> checkIfSignedIn() async {
-    final box = await Hive.openBox('authBox');
+    final box = await _box;
     _token = box.get('token');
     _isSignedIn = _token != null;
+    _role = box.get('role'); // Retrieve role during sign-in check
     notifyListeners();
     return _isSignedIn;
   }

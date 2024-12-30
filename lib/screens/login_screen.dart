@@ -116,57 +116,57 @@ class _LoginPageState extends State<LoginPage> {
                 Center(
                   child: isLoading
                       ? CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor)
+                          color: Theme.of(context).primaryColor)
                       : ElevatedButton(
-                    onPressed: () async {
-                      if (emailController.text.isEmpty ||
-                          passwordController.text.isEmpty) {
-                        showSnackBar(
-                            context, 'Please enter email and password');
-                      } else {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        try {
-                          await Provider.of<AuthProvider>(context,
-                              listen: false)
-                              .login(emailController.text, "password",
-                              passwordController.text);
-                          showSnackBar(context, 'Login Successful');
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const NavBar()),
-                          );
-                        } catch (e) {
-                          showSnackBar(
-                              context, 'Login failed: ${e.toString()}');
-                        } finally {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: screenWidth * 0.2,
-                        vertical: screenHeight * 0.02,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.045,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                          onPressed: () async {
+                            if (emailController.text.isEmpty ||
+                                passwordController.text.isEmpty) {
+                              showSnackBar(
+                                  context, 'Please enter email and password');
+                            } else {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              try {
+                                await Provider.of<AuthProvider>(context,
+                                        listen: false)
+                                    .login(emailController.text, "password",
+                                        passwordController.text);
+                                showSnackBar(context, 'Login Successful');
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const NavBar()),
+                                );
+                              } catch (e) {
+                                showSnackBar(
+                                    context, 'Login failed: ${e.toString()}');
+                              } finally {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.2,
+                              vertical: screenHeight * 0.02,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.045,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
                 ),
                 SizedBox(height: screenHeight * 0.03),
 

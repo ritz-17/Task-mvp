@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/auth_provider.dart';
+import 'login_option_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -10,6 +14,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    AuthProvider ap = AuthProvider();
     return Scaffold(
       extendBodyBehindAppBar: true,
 
@@ -20,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text(
           "Profile",
           style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 25),
         ),
         centerTitle: true,
         actions: [
@@ -37,10 +42,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 onPressed: () => Navigator.pop(context),
                                 child: const Text("Cancel")),
                             TextButton(
-                                onPressed: () {
+                                onPressed: () async {
+                                  await Provider.of<AuthProvider>(context,
+                                          listen: false)
+                                      .logout();
                                   Navigator.pop(context);
-                                  Navigator.pushReplacementNamed(
-                                      context, '/login');
+                                  Navigator.pushReplacement(
+                                      context,MaterialPageRoute(
+                                    builder: (context) => LoginOption(),
+                                  ),);
                                 },
                                 child: Text(
                                   "Logout",
@@ -51,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
               icon: const Icon(
                 Icons.logout,
-                color: Colors.white,
+                color: Colors.black,
               ))
         ],
       ),
@@ -61,15 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color.fromARGB(255, 100, 75, 255),
-              Color.fromARGB(255, 150, 125, 255),
-              Color.fromARGB(255, 200, 175, 255),
-            ],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
+          color: Colors.white,
         ),
         child: Column(
           children: [
@@ -85,21 +87,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
 
             //------------------------------ Name ------------------------------
-            const Text(
-              'Mayur Srivastav',
+            Text(
+              'Aditya',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w500,
-                color: Colors.white,
+                color: Theme.of(context).primaryColor,
               ),
             ),
 
             //--------------------------- Designation --------------------------
-            const Text(
-              'Manager',
+            Text(
+              '${ap.role}',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white70,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: 10),
@@ -113,14 +115,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   'Email: ',
                   style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white70,
+                      color: Colors.black,
                       fontWeight: FontWeight.bold),
                 ),
-                const Text(
+                Text(
                   'abccd@gmail.com',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white70,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ],
