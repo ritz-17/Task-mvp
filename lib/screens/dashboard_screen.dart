@@ -96,7 +96,7 @@ class DashboardScreen extends StatelessWidget {
                       child: Container(
                         width: double.infinity,
                         padding: EdgeInsets.all(paddingMedium),
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             SizedBox(
@@ -105,9 +105,16 @@ class DashboardScreen extends StatelessWidget {
                             //----------------- Add New Task -------------------
                             Padding(
                               padding: const EdgeInsets.all(10.0),
-                              child: Column(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  //----------------- Add Task Image------------------
+                                  Image.asset(
+                                    'assets/add_task.png', // Replace with your actual image path
+                                    width: screenWidth * 0.15,
+                                    height: screenWidth * 0.15,
+                                  ),
+                                  SizedBox(width: paddingSmall),
                                   Text(
                                     "Add New Task",
                                     style: TextStyle(
@@ -116,40 +123,31 @@ class DashboardScreen extends StatelessWidget {
                                       color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: paddingMedium),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                          context, "/createTask");
-                                    },
-                                    child: Card(
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: SizedBox(
-                                        width: screenWidth * 0.2,
-                                        height: screenWidth * 0.12,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.add,
-                                            size: screenWidth * 0.09,
-                                            color: const Color.fromARGB(
-                                                255, 122, 90, 248),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
-
-                            //----------------- Add Task Image------------------
-                            Image.asset(
-                              'assets/add_task.png', // Replace with your actual image path
-                              width: screenWidth * 0.15,
-                              height: screenWidth * 0.15,
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, "/createTask");
+                              },
+                              child: Card(
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: SizedBox(
+                                  width: screenWidth * 0.8,
+                                  height: screenWidth * 0.12,
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.add,
+                                      size: screenWidth * 0.09,
+                                      color: const Color.fromARGB(
+                                          255, 122, 90, 248),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
