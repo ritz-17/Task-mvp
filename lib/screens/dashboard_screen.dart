@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_mvp/screens/new_task_screen.dart';
 import '../utils/utils.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -85,36 +84,82 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  //----------------------- Create Task Card ----------------------
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: paddingMedium),
+                    child: Card(
+                      elevation: 4,
+                      color: const Color.fromARGB(255, 122, 90, 248),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(paddingMedium),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              width: paddingLarge,
+                            ),
+                            //----------------- Add New Task -------------------
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Add New Task",
+                                    style: TextStyle(
+                                      fontSize: headerFontSize * 0.9,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(height: paddingMedium),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, "/createTask");
+                                    },
+                                    child: Card(
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: SizedBox(
+                                        width: screenWidth * 0.2,
+                                        height: screenWidth * 0.12,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.add,
+                                            size: screenWidth * 0.09,
+                                            color: const Color.fromARGB(
+                                                255, 122, 90, 248),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            //----------------- Add Task Image------------------
+                            Image.asset(
+                              'assets/add_task.png', // Replace with your actual image path
+                              width: screenWidth * 0.15,
+                              height: screenWidth * 0.15,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-
-      
-      //---------------------- Floating Action Button --------------------------
-      floatingActionButton: SizedBox(
-        height: screenWidth * 0.14,
-        width: screenWidth * 0.14,
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => CreateTask(),
-              ),
-            );
-          },
-          backgroundColor: Theme.of(context).primaryColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(screenWidth * 0.07),
-          ),
-          child: Icon(
-            Icons.add,
-            color: Colors.white,
-            size: screenWidth * 0.07,
-          ),
         ),
       ),
     );
@@ -212,7 +257,7 @@ class DashboardScreen extends StatelessWidget {
   }) {
     return Card(
       color: const Color(0xFF795FFC),
-      elevation: 4,
+      elevation: 8,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),

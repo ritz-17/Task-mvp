@@ -171,6 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void sendPhoneNumber() {
+    // ignore: unused_local_variable
     final ap = Provider.of<AuthProvider>(context, listen: false);
     // ignore: unused_local_variable
     String phoneNumber = phoneController.text.trim();
