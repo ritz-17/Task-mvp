@@ -72,7 +72,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   height: 50,
                 ),
 
-                //------------------ Go to Dashboard Button --------------------
+                //------------------ Verify Button --------------------
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: ElevatedButton(
@@ -91,7 +91,7 @@ class _VerificationPageState extends State<VerificationPage> {
                       ),
                     ),
                     child: const Text(
-                      "Go to Dashboard",
+                      "Verify",
                       style: TextStyle(
                         color: Colors.white,
                         //fontWeight: FontWeight.bold,

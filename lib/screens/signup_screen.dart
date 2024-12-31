@@ -263,11 +263,17 @@ class _SignupPageState extends State<SignupPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have an account?",
-                              style: TextStyle(fontSize: 12)),
+                          const Text(
+                            "Already have an account?",
+                            style: TextStyle(fontSize: 12),
+                          ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, '/login');
+                              Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/login',
+                                (route) => false, // Removes all previous routes
+                              );
                             },
                             child: const Text(
                               "Login",
