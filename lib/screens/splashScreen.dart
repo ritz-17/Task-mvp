@@ -2,62 +2,67 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_mvp/screens/register_screen.dart';
+import 'package:task_mvp/screens/login_option_screen.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
 
 import '../provider/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  double _logoScale = 1.0;
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _logoController;
+  late final Animation<double> _scaleAnimation;
 
-  // Logo scaling animation
-  void _animateLogo() async {
-    const duration = Duration(milliseconds: 1500);
-    while (mounted) {
-      await Future.delayed(duration ~/ 2, () {
-        setState(() {
-          _logoScale = _logoScale == 1.0 ? 0.8 : 1.0;
-        });
-      });
-      await Future.delayed(duration ~/ 2);
-    }
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize animation
+    _logoController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
+    );
+
+    // Handle navigation
+    _navigateAfterDelay();
   }
 
-  // Navigation logic based on auth status
-  void _navigateAfterDelay() async {
-    await Future.delayed(
-        const Duration(seconds: 2)); // Short delay to display splash
+  Future<void> _navigateAfterDelay() async {
+    await Future.delayed(const Duration(seconds: 2));
 
     if (mounted) {
-      var authProvider = context.read<AuthProvider>();
-      bool isSignedIn = await authProvider.checkIfSignedIn();
+      final authProvider = context.read<AuthProvider>();
+      final isSignedIn = await authProvider.checkIfSignedIn();
 
       if (isSignedIn) {
-        await authProvider.getDataFromHive();
+        await authProvider.initializeAuthState();
       }
 
+      // Navigate to the appropriate screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) =>
-              isSignedIn ? const NavBar() : const RegisterScreen(),
+              isSignedIn ? const NavBar() : const LoginOption(),
         ),
       );
     }
   }
 
   @override
-  void initState() {
-    super.initState();
-    _animateLogo();
-    _navigateAfterDelay();
+  void dispose() {
+    _logoController.dispose();
+    super.dispose();
   }
 
   @override
@@ -75,12 +80,19 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AnimatedScale(
-                    scale: _logoScale,
-                    duration: const Duration(milliseconds: 750),
-                    curve: Curves.easeInOut,
-                    child: const Icon(Icons.shopping_cart,
-                        color: Colors.white, size: 100),
+                  AnimatedBuilder(
+                    animation: _scaleAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _scaleAnimation.value,
+                        child: child,
+                      );
+                    },
+                    child: const Icon(
+                      Icons.shopping_cart,
+                      color: Colors.white,
+                      size: 100,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   const Text(

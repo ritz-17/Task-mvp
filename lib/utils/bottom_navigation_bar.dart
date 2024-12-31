@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:task_mvp/screens/task_screen.dart';
-
+import 'package:task_mvp/screens/employee_task_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/employeeList_screen.dart';
 import '../screens/profile_screen.dart';
@@ -18,7 +17,7 @@ class _NavBarState extends State<NavBar> {
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
     EmployeeScreen(),
-    TaskScreen(),
+    EmployeeTaskPage(),
     ProfileScreen(),
   ];
 
@@ -30,7 +29,6 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),

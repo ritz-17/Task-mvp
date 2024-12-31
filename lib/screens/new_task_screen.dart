@@ -1,7 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:task_mvp/screens/task_screen.dart';
+import 'package:task_mvp/screens/employee_task_screen.dart';
 import 'package:task_mvp/utils/utils.dart';
 
 class CreateTask extends StatefulWidget {
@@ -251,7 +250,8 @@ class _CreateTaskState extends State<CreateTask> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => TaskScreen()));
+                                      builder: (context) =>
+                                          EmployeeTaskPage()));
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content:
