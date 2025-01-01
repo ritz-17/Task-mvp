@@ -101,11 +101,16 @@ class _LoginPageState extends State<LoginPage> {
                   alignment: Alignment.centerRight,
                   child: Padding(
                     padding: EdgeInsets.only(right: screenWidth * 0.04),
-                    child: Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: screenWidth * 0.035,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, "/forgotPassword");
+                      },
+                      child: Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: screenWidth * 0.035,
+                        ),
                       ),
                     ),
                   ),
