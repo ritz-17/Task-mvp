@@ -12,6 +12,8 @@ import 'package:task_mvp/screens/splashScreen.dart';
 import 'package:task_mvp/screens/verification_screen.dart';
 import 'package:task_mvp/screens/verified_screen.dart';
 
+import 'screens/forgot_password_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +48,7 @@ class MyApp extends StatelessWidget {
           '/employeeTasks': (context) => const EmployeeTaskPage(),
           '/verification': (context) => const VerificationPage(),
           '/verified': (context) => const VerifiedPage(),
+          '/forgotPassword': (context) => const ForgotPasswordPage(),
         },
       ),
     );
