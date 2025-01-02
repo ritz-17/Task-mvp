@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:task_mvp/screens/new_task_screen.dart';
-
 import '../utils/utils.dart';
 
 class DashboardScreen extends StatelessWidget {

@@ -164,4 +164,30 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     return _isSignedIn;
   }
+
+  //------------------ Forgot Password API -------------------------------------
+Future<void> forgotPassword(String email) async {
+  final forgotPasswordUrl = '${baseUrl}manager/forgot-password';
+
+  try {
+    final response = await http.post(
+      Uri.parse(forgotPasswordUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      print('Forgot Password email sent successfully');
+    } else {
+      throw Exception(data['message'] ?? 'Error sending forgot password email.');
+    }
+  } catch (e) {
+    print('Forgot Password error: $e');
+    throw Exception('Forgot Password error: $e');
+  }
 }
+
+}
+
