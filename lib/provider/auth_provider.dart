@@ -16,16 +16,14 @@ class AuthProvider extends ChangeNotifier {
 
   // Public getters
   bool get isSignedIn => _isSignedIn;
-
   String? get token => _token;
-
   String? get role => _role;
 
   // Setters
   void setRole(String role) async {
     _role = role;
     final box = await _box;
-    await box.put('role', role); // Save role in Hive
+    await box.put('role', role);
     notifyListeners();
   }
 
@@ -160,8 +158,32 @@ class AuthProvider extends ChangeNotifier {
     final box = await _box;
     _token = box.get('token');
     _isSignedIn = _token != null;
-    _role = box.get('role'); // Retrieve role during sign-in check
+    _role = box.get('role');
     notifyListeners();
     return _isSignedIn;
+  }
+
+  //check authorization
+  Future<void> checkAuth(String token) async {
+    final checkUrl = '$baseUrl$role/isauthorized';
+    try {
+      final response = await http.get(
+        Uri.parse(checkUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonList = jsonDecode(response.body);
+        print(jsonList);
+        // return jsonList.map((json) => Employee.fromJson(json)).toList();
+        notifyListeners();
+      } else {
+        throw Exception('Failed to fetch $role: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('authorization exception: $e');
+    }
   }
 }

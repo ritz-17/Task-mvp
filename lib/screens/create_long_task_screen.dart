@@ -1,37 +1,43 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:task_mvp/screens/employee_task_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:task_mvp/provider/task_provider.dart';
 import 'package:task_mvp/utils/utils.dart';
 
-class CreateTask extends StatefulWidget {
-  const CreateTask({super.key});
+import '../provider/employee_provider.dart';
+
+class CreateLongTask extends StatefulWidget {
+  const CreateLongTask({super.key});
 
   @override
-  State<CreateTask> createState() => _CreateTaskState();
+  State<CreateLongTask> createState() => _CreateLongTaskState();
 }
 
-class _CreateTaskState extends State<CreateTask> {
+class _CreateLongTaskState extends State<CreateLongTask> {
   String? selectedMember;
   String? selectedPriority;
-  String? selectedDifficulty;
+  final titleController = TextEditingController();
+  final descController = TextEditingController();
+
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      employeeProvider.loadEmployees();
+    });
+  }
 
   final List<File?> _selectedImages = [null, null, null];
   final List<bool> _isUploading = [false, false, false];
-
-  final List<String> members = ['Aditya', 'Mayur', 'Vanshika'];
   final List<String> priorities = ['High', 'Medium', 'Low'];
-  final List<String> difficulties = [
-    'Very Easy(within Hours)',
-    'Easy(A Day)',
-    'Moderate(3 Days)',
-    'Intermediate(5 Days)',
-    'Advance(1 week)'
-  ];
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    // Filter lists based on status
+    final freeMembers = Provider.of<EmployeeProvider>(context).freeMembers;
 
     return Scaffold(
       appBar: AppBar(
@@ -111,6 +117,7 @@ class _CreateTaskState extends State<CreateTask> {
 
               // Task Title Input
               TextField(
+                controller: titleController,
                 decoration: InputDecoration(
                   prefixIcon:
                       Icon(Icons.title, color: Theme.of(context).primaryColor),
@@ -123,9 +130,10 @@ class _CreateTaskState extends State<CreateTask> {
               SizedBox(height: screenHeight * 0.02),
 
               // Task Description Input
-              const TextField(
+              TextField(
+                controller: descController,
                 maxLines: 4,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: "Enter Task Description",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -150,10 +158,11 @@ class _CreateTaskState extends State<CreateTask> {
                     selectedMember = value;
                   });
                 },
-                items: members
-                    .map((member) => DropdownMenuItem(
-                          value: member,
-                          child: Text(member),
+                items: freeMembers
+                    .map((employee) => DropdownMenuItem(
+                          value: employee.id,
+                          child: Text(
+                              '${employee.firstName} ${employee.lastName}'),
                         ))
                     .toList(),
               ),
@@ -182,32 +191,6 @@ class _CreateTaskState extends State<CreateTask> {
                         ))
                     .toList(),
               ),
-              SizedBox(height: screenHeight * 0.02),
-
-              // Difficulty Dropdown
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  prefixIcon:
-                      Icon(Icons.speed, color: Theme.of(context).primaryColor),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                  ),
-                ),
-                hint: const Text("Select Difficulty"),
-                value: selectedDifficulty,
-                onChanged: (value) {
-                  setState(() {
-                    selectedDifficulty = value;
-                  });
-                },
-                items: difficulties
-                    .map((difficulty) => DropdownMenuItem(
-                          value: difficulty,
-                          child: Text(difficulty),
-                        ))
-                    .toList(),
-              ),
-
               SizedBox(height: screenHeight * 0.03),
 
               // Create Task Button
@@ -244,19 +227,28 @@ class _CreateTaskState extends State<CreateTask> {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              try {
+                                final taskProvider = Provider.of<TaskProvider>(
+                                    context,
+                                    listen: false);
+                                await taskProvider.createTask(
+                                    titleController.text,
+                                    descController.text,
+                                    "long",
+                                    "676ef82639be9031c94ae067",
+                                    "67752d89302a2090c2a11b7c");
+                                showSnackBar(
+                                    context, 'Task created successfully');
+                                print('task created');
+                                Navigator.pushReplacementNamed(
+                                    context, '/employeeTasks');
+                              } catch (e) {
+                                print(e);
+                                showSnackBar(
+                                    context, "Error creating task: $e");
+                              }
                               Navigator.pop(context);
-                              // Add your task creation logic here
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          EmployeeTaskPage()));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text("Task created successfully!")),
-                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
@@ -286,17 +278,6 @@ class _CreateTaskState extends State<CreateTask> {
               ),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Theme.of(context).primaryColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(50),
-        ),
-        child: Icon(
-          Icons.mic,
-          color: Colors.white,
         ),
       ),
     );
