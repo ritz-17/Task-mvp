@@ -17,6 +17,8 @@ import 'package:task_mvp/screens/verification_screen.dart';
 import 'package:task_mvp/screens/verified_screen.dart';
 import 'package:task_mvp/screens/forgot_password_screen.dart';
 
+import 'screens/create_short_task_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
@@ -54,6 +56,7 @@ class MyApp extends StatelessWidget {
           '/verified': (context) => const VerifiedPage(),
           '/forgotPassword': (context) => const ForgotPasswordPage(),
           '/createTask': (context) => const CreateLongTask(),
+          '/createShortTask': (context) => const CreateShortTask(),
         },
       ),
     );

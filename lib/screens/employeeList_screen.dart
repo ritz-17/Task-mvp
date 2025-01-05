@@ -14,88 +14,117 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   @override
   void initState() {
     super.initState();
+    // ---------------------------------- Load Employees ------------------------------------
+    // Load employee data when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
       employeeProvider.loadEmployees();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    // ----------------------------------- Screen Dimensions --------------------------------
+    // Get the dimensions of the screen for responsive UI
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    // ----------------------------------- Employee Provider --------------------------------
+    // Access the EmployeeProvider for data
     final employeeProvider = Provider.of<EmployeeProvider>(context);
 
+    // ----------------------------------- Filtered Employees -------------------------------
+    // Categorize employees based on their status
     final employees = employeeProvider.employees;
-
-    // Filter lists based on status
-    final activeMembers = employees.where((member) => member.status == 'active').toList();
-    final freeMembers = employees.where((member) => member.status == 'free').toList();
+    final activeMembers =
+        employees.where((member) => member.status == 'active').toList();
+    final freeMembers =
+        employees.where((member) => member.status == 'free').toList();
     final unavailableMembers =
-    employees.where((member) => member.status == 'unavailable').toList();
+        employees.where((member) => member.status == 'unavailable').toList();
 
+    // --------------------------------------- UI Layout ------------------------------------
     return Scaffold(
       appBar: AppBar(
         title: const Text('Employee List'),
         centerTitle: true,
       ),
       body: employeeProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+          ? const Center(
+              child: CircularProgressIndicator()) // Show loading indicator
+          : SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ---------------------- Active Members Section ----------------------
+                  _buildSection("Active Members", activeMembers, screenWidth,
+                      screenHeight),
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // ------------------------ Free Members Section ----------------------
+                  _buildSection("Free", freeMembers, screenWidth, screenHeight),
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // -------------------- Unavailable Members Section -------------------
+                  _buildSection("Unavailable", unavailableMembers, screenWidth,
+                      screenHeight),
+                ],
+              ),
+            ),
+    );
+  }
+
+  // ------------------------------------ Section Builder ------------------------------------
+  // Builds each section of employees (Active, Free, Unavailable)
+  Widget _buildSection(
+    String title,
+    List<Employee> members,
+    double screenWidth,
+    double screenHeight,
+  ) {
+    return Card(
+      elevation: 4,
+      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(screenHeight * 0.02),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSection("Active Members", activeMembers, screenWidth, screenHeight),
-            SizedBox(height: screenHeight * 0.02),
-            _buildSection("Free", freeMembers, screenWidth, screenHeight),
-            SizedBox(height: screenHeight * 0.02),
-            _buildSection("Unavailable", unavailableMembers, screenWidth, screenHeight),
+            // --------------------------- Section Title ---------------------------
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: screenHeight * 0.022,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.01),
+
+            // ---------------------- Employee Cards in Wrap -----------------------
+            Wrap(
+              spacing: screenWidth * 0.04,
+              runSpacing: screenHeight * 0.02,
+              children: members
+                  .map((member) =>
+                      _buildMemberCard(member, screenWidth, screenHeight))
+                  .toList(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSection(
-      String title,
-      List<Employee> members,
-      double screenWidth,
-      double screenHeight,
-      ) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: SizedBox(
-        width: screenWidth * 0.95,
-        child: Padding(
-          padding: EdgeInsets.all(screenHeight * 0.02),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style:
-                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: screenHeight * 0.01),
-              Wrap(
-                spacing: screenWidth * 0.04,
-                runSpacing: screenHeight * 0.02,
-                children: members
-                    .map((member) => _buildMemberCard(member, screenHeight))
-                    .toList(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMemberCard(Employee member, double screenHeight) {
+  // ----------------------------------- Member Card Builder ---------------------------------
+  // Builds individual employee cards with avatar and status indicator
+  Widget _buildMemberCard(
+      Employee member, double screenWidth, double screenHeight) {
+    // ----------------------- Determine Status Color ---------------------------
     Color statusColor;
     switch (member.status) {
       case "active":
@@ -111,20 +140,23 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         statusColor = Colors.grey;
     }
 
+    // -------------------------- Member Card Layout ---------------------------
     return Column(
       children: [
         Stack(
           alignment: Alignment.bottomRight,
           children: [
+            // ----------------------- Placeholder Avatar -------------------------
             CircleAvatar(
               radius: screenHeight * 0.04,
-              backgroundColor: Colors.blueAccent, // Placeholder color
+              backgroundColor: Colors.blueAccent,
               child: Icon(
                 Icons.person,
                 size: screenHeight * 0.04,
                 color: Colors.white,
-              ), // Placeholder icon
+              ),
             ),
+            // ------------------------ Status Indicator --------------------------
             CircleAvatar(
               radius: screenHeight * 0.012,
               backgroundColor: Colors.white,
@@ -136,6 +168,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
           ],
         ),
         SizedBox(height: screenHeight * 0.005),
+        // ------------------------- Employee Name ------------------------------
         Text(
           member.firstName,
           style: TextStyle(fontSize: screenHeight * 0.018),

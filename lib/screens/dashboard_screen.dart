@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/utils.dart';
+import 'choose_task_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -156,7 +157,7 @@ class DashboardScreen extends StatelessWidget {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(context, "/createTask");
+                                ChooseTask(context);
                               },
                               child: Card(
                                 elevation: 4,
@@ -193,14 +194,14 @@ class DashboardScreen extends StatelessWidget {
 
   //--------------------------- Header Build Method ----------------------------
   Widget _buildHeader(
-      BuildContext context, {
-        required SharedPreferences prefs,
-        required double headerFontSize,
-        required double subheaderFontSize,
-        required double padding,
-        required double avatarRadius,
-        required double iconSize,
-      }) {
+    BuildContext context, {
+    required SharedPreferences prefs,
+    required double headerFontSize,
+    required double subheaderFontSize,
+    required double padding,
+    required double avatarRadius,
+    required double iconSize,
+  }) {
     return Padding(
       padding: EdgeInsets.all(padding),
       child: Row(
@@ -276,12 +277,12 @@ class DashboardScreen extends StatelessWidget {
 
   //------------------------ Summary Card Build Method -------------------------
   Widget _buildSummaryCard(
-      BuildContext context, {
-        required double titleSize,
-        required double subtitleSize,
-        required double imageSize,
-        required double padding,
-      }) {
+    BuildContext context, {
+    required double titleSize,
+    required double subtitleSize,
+    required double imageSize,
+    required double padding,
+  }) {
     return Card(
       color: const Color(0xFF795FFC),
       elevation: 8,
