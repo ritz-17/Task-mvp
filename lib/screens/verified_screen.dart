@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:task_mvp/utils/bottom_navigation_bar.dart';
-import 'dashboard_screen.dart';
 
 class VerifiedPage extends StatefulWidget {
   const VerifiedPage({super.key});

@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../provider/auth_provider.dart';
 import '../utils/login_text_field.dart';
 import '../utils/utils.dart';
 
@@ -86,17 +84,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ? CircularProgressIndicator(
                           color: Theme.of(context).primaryColor)
                       : ElevatedButton(
-                        
                           onPressed: () async {
                             if (emailController.text.isEmpty) {
                               showSnackBar(context, 'Please enter email');
-                              return;
-                            }
-
-                            final emailRegex = RegExp(r'^[^@]+@[^@]+\\.[^@]+');
-                            if (!emailRegex.hasMatch(emailController.text)) {
-                              showSnackBar(context,
-                                  'Please enter a valid email address');
                               return;
                             }
 
@@ -104,21 +94,32 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               isLoading = true;
                             });
 
-                            try {
-                              final authProvider = Provider.of<AuthProvider>(
-                                  context,
-                                  listen: false);
-                              await authProvider
-                                  .forgotPassword(emailController.text);
-                              showSnackBar(context,
-                                  'Forgot Password email sent successfully!');
-                            } catch (e) {
-                              showSnackBar(context, 'Error: ${e.toString()}');
-                            } finally {
-                              setState(() {
-                                isLoading = false;
-                              });
+                            final response = await http.post(
+                              Uri.parse(
+                                  'https://backend.taskmaster.outlfy.com/manager/forgot-password'),
+                              headers: <String, String>{
+                                'Content-Type':
+                                    'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String>{
+                                'email': emailController.text,
+                              }),
+                            );
+
+                            if (response.statusCode == 200) {
+                              // Handle successful email sending
+                              print('Email sent successfully!');
+                              showSnackBar(context, 'Email sent successfully!');
+                            } else {
+                              // Handle API errors
+                              print(
+                                  'Error sending email: ${response.statusCode}');
+                              showSnackBar(context, 'Error sending email!');
                             }
+
+                            setState(() {
+                              isLoading = false;
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Theme.of(context).primaryColor,

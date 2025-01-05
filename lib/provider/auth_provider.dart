@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   // Box initialization
   final Future<Box> _box = Hive.openBox('authBox');
   final String baseUrl = "https://backend.taskmaster.outlfy.com/";
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   // Private fields
   bool _isSignedIn = false;
@@ -16,16 +19,14 @@ class AuthProvider extends ChangeNotifier {
 
   // Public getters
   bool get isSignedIn => _isSignedIn;
-
   String? get token => _token;
-
   String? get role => _role;
 
   // Setters
   void setRole(String role) async {
     _role = role;
     final box = await _box;
-    await box.put('role', role); // Save role in Hive
+    await box.put('role', role);
     notifyListeners();
   }
 
@@ -129,7 +130,7 @@ class AuthProvider extends ChangeNotifier {
 
       if (response.statusCode == 200 && data['token'] != null) {
         _token = data['token'];
-        await _updateHive('token', _token);
+        await _secureStorage.write(key: 'token', value: _token);
         await _updateHive('isSignedIn', true);
 
         _isSignedIn = true;
@@ -148,6 +149,7 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     final box = await _box;
     await box.delete('token');
+    _secureStorage.delete(key: 'token');
     await box.put('isSignedIn', false);
     _isSignedIn = false;
     _token = null;
@@ -158,36 +160,150 @@ class AuthProvider extends ChangeNotifier {
   // Check if user is signed in
   Future<bool> checkIfSignedIn() async {
     final box = await _box;
-    _token = box.get('token');
+    _token = await _secureStorage.read(key: 'token');
     _isSignedIn = _token != null;
-    _role = box.get('role'); // Retrieve role during sign-in check
+    _role = box.get('role');
+    checkAuth();
     notifyListeners();
     return _isSignedIn;
   }
 
-  //------------------ Forgot Password API -------------------------------------
-Future<void> forgotPassword(String email) async {
-  final forgotPasswordUrl = '${baseUrl}manager/forgot-password';
+  //check authorization
+  Future<void> checkAuth() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final checkUrl = '$baseUrl$role/isauthorized';
 
-  try {
-    final response = await http.post(
-      Uri.parse(forgotPasswordUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    );
+    try {
+      final response = await http.get(
+        Uri.parse(checkUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
 
-    final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      print('Forgot Password email sent successfully');
-    } else {
-      throw Exception(data['message'] ?? 'Error sending forgot password email.');
+        if (jsonResponse['success'] == true) {
+          // Extract user details from response
+          final userData = jsonResponse['data'];
+
+          // Save user details in SharedPreferences
+          await prefs.setString('userId', userData['_id']);
+          await prefs.setString('firstName', userData['firstName']);
+          await prefs.setString('lastName', userData['lastName']);
+          await prefs.setString('email', userData['email']);
+          await prefs.setString('phone', userData['phone']);
+          await prefs.setBool('isVerified', userData['isVerified']);
+          await prefs.setString('createdAt', userData['createdAt']);
+          await prefs.setString('updatedAt', userData['updatedAt']);
+
+          // Print data for debugging
+          print('User details stored successfully: $userData');
+
+          notifyListeners();
+        } else {
+          throw Exception('Authorization failed: ${jsonResponse['message']}');
+        }
+      } else {
+        throw Exception('Failed to fetch $role: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Authorization exception: $e');
     }
-  } catch (e) {
-    print('Forgot Password error: $e');
-    throw Exception('Forgot Password error: $e');
+  }
+
+  //------------------ Forgot Password API -------------------------------------
+  Future<void> forgotPassword(String email) async {
+    final forgotPasswordUrl = '${baseUrl}manager/forgot-password';
+
+    try {
+      final response = await http.post(
+        Uri.parse(forgotPasswordUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        print('Forgot Password email sent successfully');
+      } else {
+        throw Exception(
+            data['message'] ?? 'Error sending forgot password email.');
+      }
+    } catch (e) {
+      print('Forgot Password error: $e');
+      throw Exception('Forgot Password error: $e');
+    }
+  }
+
+// ------------------------- Fetch CreatedBy ID ------------------------------
+
+  Future<String?> fetchUserId() async {
+    final apiUrl = '${baseUrl}manager/isauthorized';
+
+    if (_token == null) {
+      print('Token is null. Cannot fetch user ID.');
+      return null;
+    }
+
+    try {
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Authorization':
+              'Bearer $_token', // Pass the token in Authorization header
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final userId =
+            data['data']['_id']; // Access the _id inside the data field
+        print("Successssssssssssssssss");
+        print('Fetched User ID (createdBy): $userId');
+        return userId;
+      } else {
+        print('Failed to fetch user ID: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching user ID: $e');
+      return null;
+    }
+  }
+
+  //------------------------- Create Short Task API ----------------------------
+  Future<void> createTask(Map<String, dynamic> requestBody) async {
+    const createTaskUrl = 'https://backend.taskmaster.outlfy.com/task';
+
+    try {
+      final response = await http.post(
+        Uri.parse(createTaskUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token', // Use _token here as well
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      // Debug the task creation response
+      print('Create Task API Response: ${response.body}');
+
+      final data = jsonDecode(response.body);
+      print(data);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Success");
+        print('Task created successfully: $data');
+      } else {
+        print("Failed to create task");
+      }
+    } catch (e) {
+      print('Create Task error: $e');
+      throw Exception('Create Task error: $e');
+    }
   }
 }
-
-}
-
