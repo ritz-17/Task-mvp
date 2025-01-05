@@ -247,8 +247,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                                     titleController.text,
                                     descController.text,
                                     "long",
-                                    selectedMember!,
-                                    prefs.get('userId').toString());
+                                    selectedMember!,);
                                 showSnackBar(
                                     context, 'Task created successfully');
                                 Navigator.pushReplacementNamed(
