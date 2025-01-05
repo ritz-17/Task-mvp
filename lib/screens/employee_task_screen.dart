@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:task_mvp/provider/timer_provider.dart';
-import 'package:task_mvp/utils/task_list_tile.dart';
-import 'task_detail_screen.dart';
+import '../provider/task_provider.dart';
+import '../provider/timer_provider.dart';
+import '../models/task_model.dart';
 
 class EmployeeTaskPage extends StatefulWidget {
   const EmployeeTaskPage({super.key});
@@ -12,66 +12,106 @@ class EmployeeTaskPage extends StatefulWidget {
 }
 
 class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
-  List<Task> tasks = [
-    Task(
-      name: 'Task 1',
-      timeToComplete: Duration(minutes: 60), // 1 hour
-      description: 'Description 1',
-    ),
-    Task(
-      name: 'Task 2',
-      timeToComplete: Duration(minutes: 30),
-      description: 'Description 2',
-    ),
-    Task(
-      name: 'Task 3',
-      timeToComplete: Duration(hours: 2),
-      description: 'Description 3',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Fetch tasks when the screen is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TaskProvider>(context, listen: false).fetchTaskList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'My Tasks',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: ChangeNotifierProvider(
-        create: (context) => TimerProvider(),
-        child: ListView.builder(
-          itemCount: tasks.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TaskDetailScreen(task: tasks[index]),
+      body: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => TimerProvider()),
+        ],
+        child: Consumer<TaskProvider>(
+          builder: (context, taskProvider, _) {
+            final tasks = taskProvider.taskList;
+
+            if (taskProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (tasks.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No tasks available',
+                  style: TextStyle(fontSize: 16),
+                ),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                final task = tasks[index];
+
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 5.0),
+                  child: ListTile(
+                    title: Text(
+                      task.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Description: ${task.description}"),
+                        Text("Status: ${task.status}"),
+                      ],
+                    ),
+                    // trailing: Row(
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   children: [
+                    //     ElevatedButton(
+                    //       onPressed: () {
+                    //         setState(() {
+                    //           task.status = 'Accepted';
+                    //         });
+                    //         Provider.of<TimerProvider>(context, listen: false)
+                    //             .startTimer();
+                    //       },
+                    //       child: const Text('Accept'),
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Colors.green,
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 5),
+                    //     ElevatedButton(
+                    //       onPressed: () {
+                    //         setState(() {
+                    //           task.status = 'Rejected';
+                    //         });
+                    //       },
+                    //       child: const Text('Reject'),
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Colors.red,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ),
                 );
               },
-              child: TaskTile(
-                task: tasks[index],
-                onAccept: () {
-                  setState(() {
-                    tasks[index].status = 'Accepted';
-                  });
-                  Provider.of<TimerProvider>(context, listen: false).startTimer(); 
-                },
-                onReject: () {
-                  setState(() {
-                    tasks[index].status = 'Rejected';
-                  });
-                },
-              ),
             );
           },
         ),

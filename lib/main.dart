@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           '/verification': (context) => const VerificationPage(),
           '/verified': (context) => const VerifiedPage(),
           '/forgotPassword': (context) => const ForgotPasswordPage(),
-          '/createTask': (context) => const CreateLongTask(),
+          '/createLongTask': (context) => const CreateLongTask(),
           '/createShortTask': (context) => const CreateShortTask(),
         },
       ),
