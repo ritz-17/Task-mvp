@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../provider/auth_provider.dart';
 import 'login_option_screen.dart';
@@ -12,6 +13,25 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  String? userId;
+  String? firstName;
+  String? email;
+
+  @override
+  void initState() {
+    super.initState();
+    getUserDetails();
+  }
+
+  Future<void> getUserDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('userId') ?? 'Not Available';
+      firstName = prefs.getString('firstName') ?? 'Not Available';
+      email = prefs.getString('email') ?? 'Not Available';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     AuthProvider ap = AuthProvider();
@@ -30,39 +50,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                          title: const Text("Logout"),
-                          content:
-                              const Text("Are you sure you want to logout?"),
-                          actions: [
-                            TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text("Cancel")),
-                            TextButton(
-                                onPressed: () async {
-                                  await Provider.of<AuthProvider>(context,
-                                          listen: false)
-                                      .logout();
-                                  Navigator.pop(context);
-                                  Navigator.pushReplacement(
-                                      context,MaterialPageRoute(
-                                    builder: (context) => LoginOption(),
-                                  ),);
-                                },
-                                child: Text(
-                                  "Logout",
-                                  style: TextStyle(color: Colors.red),
-                                ))
-                          ],
-                        ));
-              },
-              icon: const Icon(
-                Icons.logout,
-                color: Colors.black,
-              ))
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text("Logout"),
+                  content: const Text("Are you sure you want to logout?"),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Cancel")),
+                    TextButton(
+                        onPressed: () async {
+                          await Provider.of<AuthProvider>(context, listen: false)
+                              .logout();
+                          Navigator.pop(context);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginOption(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.red),
+                        ))
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.logout,
+              color: Colors.black,
+            ),
+          ),
         ],
       ),
 
@@ -74,12 +96,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: Colors.white,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 125),
+            const SizedBox(height: 100),
 
             //-------------------------- Profile Picture -----------------------
             CircleAvatar(
-              radius: 60,
+              radius: 70,
               backgroundImage: NetworkImage(
                 'https://images.pexels.com/photos/16869355/pexels-photo-16869355/free-photo-of-black-and-white-shot-of-a-man-in-a-suit.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
               ),
@@ -88,45 +111,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             //------------------------------ Name ------------------------------
             Text(
-              'Aditya',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-
-            //--------------------------- Designation --------------------------
-            Text(
-              '${ap.role}',
-              style: TextStyle(
-                fontSize: 16,
+              firstName ?? '',
+              style: const TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
 
-            //-------------------------- Email ---------------------------------
+            //--------------------------- Role -------------------------------
+            Text(
+              'Role: ${ap.role ?? "Not Defined"}',
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 16),
 
+            //-------------------------- User ID ------------------------------
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'Email: ',
+                  'User ID: ',
                   style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
-                  'abccd@gmail.com',
+                  userId ?? '',
                   style: TextStyle(
                     fontSize: 16,
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
               ],
-            )
+            ),
+            const SizedBox(height: 8),
+
+            //-------------------------- Email ---------------------------------
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Email: ',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  email ?? '',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            //------------------------ UI Improvements -------------------------
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Divider(
+                color: Colors.grey.shade300,
+                thickness: 1,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Welcome to your profile screen!',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w400,
+                color: Colors.black54,
+              ),
+            ),
           ],
         ),
       ),

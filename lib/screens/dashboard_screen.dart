@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/utils.dart';
 
@@ -33,13 +34,39 @@ class DashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //-------------------- Header Section ------------------------
-                  _buildHeader(
-                    context,
-                    headerFontSize: headerFontSize,
-                    subheaderFontSize: subheaderFontSize,
-                    padding: paddingLarge,
-                    avatarRadius: screenWidth * 0.06,
-                    iconSize: screenWidth * 0.06,
+                  FutureBuilder<SharedPreferences>(
+                    future: SharedPreferences.getInstance(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Padding(
+                          padding: EdgeInsets.all(paddingLarge),
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Padding(
+                          padding: EdgeInsets.all(paddingLarge),
+                          child: Text(
+                            'Error loading user data',
+                            style: TextStyle(
+                              fontSize: headerFontSize,
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      }
+
+                      final prefs = snapshot.data!;
+                      return _buildHeader(
+                        context,
+                        prefs: prefs,
+                        headerFontSize: headerFontSize,
+                        subheaderFontSize: subheaderFontSize,
+                        padding: paddingLarge,
+                        avatarRadius: screenWidth * 0.06,
+                        iconSize: screenWidth * 0.06,
+                      );
+                    },
                   ),
                   //--------------------- Summary Card -------------------------
                   Padding(
@@ -166,13 +193,14 @@ class DashboardScreen extends StatelessWidget {
 
   //--------------------------- Header Build Method ----------------------------
   Widget _buildHeader(
-    BuildContext context, {
-    required double headerFontSize,
-    required double subheaderFontSize,
-    required double padding,
-    required double avatarRadius,
-    required double iconSize,
-  }) {
+      BuildContext context, {
+        required SharedPreferences prefs,
+        required double headerFontSize,
+        required double subheaderFontSize,
+        required double padding,
+        required double avatarRadius,
+        required double iconSize,
+      }) {
     return Padding(
       padding: EdgeInsets.all(padding),
       child: Row(
@@ -194,7 +222,7 @@ class DashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hello Aditya',
+                        'Hello ${prefs.getString('firstName')}',
                         style: TextStyle(
                           fontSize: headerFontSize,
                           fontWeight: FontWeight.bold,
@@ -248,12 +276,12 @@ class DashboardScreen extends StatelessWidget {
 
   //------------------------ Summary Card Build Method -------------------------
   Widget _buildSummaryCard(
-    BuildContext context, {
-    required double titleSize,
-    required double subtitleSize,
-    required double imageSize,
-    required double padding,
-  }) {
+      BuildContext context, {
+        required double titleSize,
+        required double subtitleSize,
+        required double imageSize,
+        required double padding,
+      }) {
     return Card(
       color: const Color(0xFF795FFC),
       elevation: 8,

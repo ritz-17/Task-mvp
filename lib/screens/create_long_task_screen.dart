@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mvp/provider/task_provider.dart';
 import 'package:task_mvp/utils/utils.dart';
 
@@ -20,10 +21,18 @@ class _CreateLongTaskState extends State<CreateLongTask> {
   final titleController = TextEditingController();
   final descController = TextEditingController();
 
+  @override
+  void dispose() {
+    titleController.dispose();
+    descController.dispose();
+    super.dispose();
+  }
+
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
       employeeProvider.loadEmployees();
     });
   }
@@ -228,6 +237,8 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
+                              final SharedPreferences prefs =
+                                  await SharedPreferences.getInstance();
                               try {
                                 final taskProvider = Provider.of<TaskProvider>(
                                     context,
@@ -236,13 +247,13 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                                     titleController.text,
                                     descController.text,
                                     "long",
-                                    "676ef82639be9031c94ae067",
-                                    "67752d89302a2090c2a11b7c");
+                                    selectedMember!,
+                                    prefs.get('userId').toString());
                                 showSnackBar(
                                     context, 'Task created successfully');
-                                print('task created');
                                 Navigator.pushReplacementNamed(
                                     context, '/employeeTasks');
+                                print('task created');
                               } catch (e) {
                                 print(e);
                                 showSnackBar(

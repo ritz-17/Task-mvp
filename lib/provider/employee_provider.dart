@@ -1,17 +1,19 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/employee_model.dart';
 
 class EmployeeService {
   static const String baseUrl = "https://backend.taskmaster.outlfy.com";
+  static final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   static Future<String?> _getToken() async {
-    final box = await Hive.openBox('authBox');
-    return box.get('token');
+    final token = await _secureStorage.read(key: 'token');
+    print("Token retrieved: $token");
+    return token;
   }
 
   static Future<List<Employee>> fetchEmployees() async {
@@ -36,6 +38,7 @@ class EmployeeService {
     }
   }
 }
+
 
 // Employee Provider for State Management
 class EmployeeProvider extends ChangeNotifier {

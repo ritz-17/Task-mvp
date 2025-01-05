@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'package:task_mvp/provider/auth_provider.dart';
 
 class TaskProvider extends ChangeNotifier {
   static const String baseUrl = "https://backend.taskmaster.outlfy.com";
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
-  static Future<String?> _getToken() async {
-    final box = await Hive.openBox('authBox');
-    print("Token retrieved: ${box.get('token')}");
-    return box.get('token');
+  Future<String?> _getToken() async {
+    final token = _secureStorage.read(key: 'token');
+    print("Token retrieved: $token");
+    return token;
   }
 
   Future<void> createTask(String title, String description, String jobType,
@@ -22,9 +22,6 @@ class TaskProvider extends ChangeNotifier {
     }
 
     try {
-      // final ap = AuthProvider();
-      // await ap.checkAuth(token);
-
       final response = await http.post(
         Uri.parse('$baseUrl/task'),
         headers: {
@@ -42,7 +39,6 @@ class TaskProvider extends ChangeNotifier {
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 201) {
-        notifyListeners();
       } else {
         throw Exception(
           'Failed to create Task: ${data['error'] ?? response.reasonPhrase}',
@@ -50,6 +46,8 @@ class TaskProvider extends ChangeNotifier {
       }
     } catch (e) {
       throw Exception('Authorization exception: $e');
+    } finally {
+      notifyListeners();
     }
   }
 }
