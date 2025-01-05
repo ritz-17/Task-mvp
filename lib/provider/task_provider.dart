@@ -9,7 +9,7 @@ import '../models/task_model.dart';
 
 class TaskProvider extends ChangeNotifier {
   List<Task> _taskList = [];
-  final bool _isLoading = false;
+  bool _isLoading = false;
 
   List<Task> get taskList => _taskList;
 

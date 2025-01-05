@@ -14,8 +14,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String? userId;
-  String? firstName;
+  String? Name;
   String? email;
+  String? role;
 
   @override
   void initState() {
@@ -27,14 +28,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       userId = prefs.getString('userId') ?? 'Not Available';
-      firstName = prefs.getString('firstName') ?? 'Not Available';
+      Name = '${prefs.getString('firstName') ?? 'Not Available'} ${prefs.getString('lastName') ?? ''}';
       email = prefs.getString('email') ?? 'Not Available';
+      role = prefs.getString('role') ?? 'Not Available';
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
-    AuthProvider ap = AuthProvider();
     return Scaffold(
       extendBodyBehindAppBar: true,
 
@@ -111,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             //------------------------------ Name ------------------------------
             Text(
-              firstName ?? '',
+              Name ?? '',
               style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -122,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             //--------------------------- Role -------------------------------
             Text(
-              'Role: ${ap.role ?? "Not Defined"}',
+              'Role: ${role ?? "Not Defined"}',
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black54,

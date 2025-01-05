@@ -18,6 +18,7 @@ class CreateLongTask extends StatefulWidget {
 class _CreateLongTaskState extends State<CreateLongTask> {
   String? selectedMember;
   String? selectedPriority;
+  String? managerId;
   final titleController = TextEditingController();
   final descController = TextEditingController();
 
@@ -246,8 +247,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                                 await taskProvider.createTask(
                                     titleController.text,
                                     descController.text,
-                                    "long",
-                                    selectedMember!,);
+                                    "long",selectedMember!);
                                 showSnackBar(
                                     context, 'Task created successfully');
                                 Navigator.pushReplacementNamed(

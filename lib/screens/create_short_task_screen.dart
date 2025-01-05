@@ -16,7 +16,6 @@ class _CreateShortTaskState extends State<CreateShortTask> {
   String? selectedMember;
   final titleController = TextEditingController();
   final descController = TextEditingController();
-  String? managerId; // Store logged-in manager's ID
 
   @override
   void dispose() {
@@ -27,19 +26,11 @@ class _CreateShortTaskState extends State<CreateShortTask> {
 
   @override
   void initState() {
-    super.initState();
-    _initializeManagerId(); // Retrieve manager's ID
+    super.initState(); // Retrieve manager's ID
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final employeeProvider =
           Provider.of<EmployeeProvider>(context, listen: false);
       employeeProvider.loadEmployees();
-    });
-  }
-
-  Future<void> _initializeManagerId() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      managerId = prefs.getString('userId'); // Retrieve the logged-in user ID
     });
   }
 
@@ -128,16 +119,10 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (managerId == null) {
-                      showSnackBar(context, "Manager ID not found.");
-                      return;
-                    }
                     if (selectedMember == null) {
                       showSnackBar(context, "Please select a member.");
                       return;
                     }
-
-                    // Confirmation dialog before task creation
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
@@ -174,19 +159,15 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                                   titleController.text,
                                   descController.text,
                                   "short",
-                                  selectedMember!,
-                                   // Use logged-in manager's ID
+                                  selectedMember!
                                 );
 
                                 // Show success message
                                 showSnackBar(
                                     context, 'Task created successfully');
-
-                                // Navigate to the Employee Tasks screen
                                 Navigator.pushReplacementNamed(
                                     context, '/employeeTasks');
                               } catch (e) {
-                                // Show error message
                                 showSnackBar(
                                     context, "Error creating task: $e");
                               }

@@ -13,12 +13,23 @@ void ChooseTask(BuildContext context) {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Select Task Type',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Select Task Type',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             ListTile(
@@ -33,15 +44,8 @@ void ChooseTask(BuildContext context) {
               leading: Icon(Icons.hourglass_bottom),
               title: Text('Long Task'),
               onTap: () {
-                Navigator.pushNamed(context, '/createTask');
+                Navigator.pushNamed(context, '/createLongTask');
                 // Handle Long Task action
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.close),
-              title: Text('Close'),
-              onTap: () {
-                Navigator.pop(context);
               },
             ),
           ],
