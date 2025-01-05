@@ -1,42 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_mvp/models/employee_model.dart';
+import 'package:task_mvp/provider/employee_provider.dart';
 
 class EmployeeScreen extends StatefulWidget {
-  const EmployeeScreen({super.key});
+  const EmployeeScreen({Key? key}) : super(key: key);
 
   @override
   State<EmployeeScreen> createState() => _EmployeeScreenState();
 }
 
 class _EmployeeScreenState extends State<EmployeeScreen> {
-  final List<Map<String, dynamic>> allMembers = [
-    {"name": "Chad", "image": "https://i.pravatar.cc/150?img=1", "status": "active"},
-    {"name": "Matt", "image": "https://i.pravatar.cc/150?img=2", "status": "active"},
-    {"name": "Julie", "image": "https://i.pravatar.cc/150?img=3", "status": "active"},
-    {"name": "Chad", "image": "https://i.pravatar.cc/150?img=1", "status": "active"},
-    {"name": "Matt", "image": "https://i.pravatar.cc/150?img=2", "status": "active"},
-    {"name": "Julie", "image": "https://i.pravatar.cc/150?img=3", "status": "active"},
-    {"name": "Yuri", "image": "https://i.pravatar.cc/150?img=4", "status": "free"},
-    {"name": "Chad", "image": "https://i.pravatar.cc/150?img=5", "status": "free"},
-    {"name": "Matt", "image": "https://i.pravatar.cc/150?img=6", "status": "unavailable"},
-    {"name": "Julie", "image": "https://i.pravatar.cc/150?img=7", "status": "unavailable"},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final employeeProvider = Provider.of<EmployeeProvider>(context, listen: false);
+      employeeProvider.loadEmployees();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
+
+    final employees = employeeProvider.employees;
 
     // Filter lists based on status
-    final activeMembers = allMembers.where((member) => member['status'] == 'active').toList();
-    final freeMembers = allMembers.where((member) => member['status'] == 'free').toList();
-    final unavailableMembers = allMembers.where((member) => member['status'] == 'unavailable').toList();
+    final activeMembers = employees.where((member) => member.status == 'active').toList();
+    final freeMembers = employees.where((member) => member.status == 'free').toList();
+    final unavailableMembers =
+    employees.where((member) => member.status == 'unavailable').toList();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Employee List'),
         centerTitle: true,
       ),
-      body: Padding(
+      body: employeeProvider.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
         padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +59,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
   Widget _buildSection(
       String title,
-      List<Map<String, dynamic>> members,
+      List<Employee> members,
       double screenWidth,
       double screenHeight,
       ) {
@@ -64,7 +69,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         borderRadius: BorderRadius.circular(16),
       ),
       child: SizedBox(
-        width: screenWidth * 0.95, // Stretching card width
+        width: screenWidth * 0.95,
         child: Padding(
           padding: EdgeInsets.all(screenHeight * 0.02),
           child: Column(
@@ -72,13 +77,16 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style:
+                const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: screenHeight * 0.01),
               Wrap(
                 spacing: screenWidth * 0.04,
                 runSpacing: screenHeight * 0.02,
-                children: members.map((member) => _buildMemberCard(member, screenHeight)).toList(),
+                children: members
+                    .map((member) => _buildMemberCard(member, screenHeight))
+                    .toList(),
               ),
             ],
           ),
@@ -87,9 +95,9 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     );
   }
 
-  Widget _buildMemberCard(Map<String, dynamic> member, double screenHeight) {
+  Widget _buildMemberCard(Employee member, double screenHeight) {
     Color statusColor;
-    switch (member["status"]) {
+    switch (member.status) {
       case "active":
         statusColor = Colors.green;
         break;
@@ -110,7 +118,12 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
           children: [
             CircleAvatar(
               radius: screenHeight * 0.04,
-              backgroundImage: NetworkImage(member["image"]),
+              backgroundColor: Colors.blueAccent, // Placeholder color
+              child: Icon(
+                Icons.person,
+                size: screenHeight * 0.04,
+                color: Colors.white,
+              ), // Placeholder icon
             ),
             CircleAvatar(
               radius: screenHeight * 0.012,
@@ -124,7 +137,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         ),
         SizedBox(height: screenHeight * 0.005),
         Text(
-          member["name"],
+          member.firstName,
           style: TextStyle(fontSize: screenHeight * 0.018),
         ),
       ],

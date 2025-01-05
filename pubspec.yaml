@@ -33,6 +33,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^4.2.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   http: ^1.2.2
@@ -68,11 +69,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/google_logo.png
-    - assets/facebook_logo.png
-    - assets/twitter_logo.png
-    - assets/verification.png
-    - assets/verified.png
+    - assets/
     # An image asset can refer to one or more resolution-specific "variants", see
     # https://flutter.dev/to/resolution-aware-images
     # For details regarding adding assets from package dependencies, see
