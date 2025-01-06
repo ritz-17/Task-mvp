@@ -48,39 +48,53 @@ class TaskProvider extends ChangeNotifier {
         },
       );
 
+      print('Fetch Task Response: ${response.body}'); // Debugging
+
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        final jsonResponse = jsonDecode(response.body);
 
-        if (jsonResponse['success'] == true) {
-          final List<dynamic> taskData = jsonResponse['data'];
-          _taskList = taskData
-              .map((e) => Task.fromJson(e))
-              .where((task) => task.createdBy == userId)
-              .toList();
-
-          notifyListeners();
-        } else {
-          throw Exception('Authorization failed: ${jsonResponse['message']}');
+        if (jsonResponse == null || jsonResponse['success'] != true) {
+          throw Exception(
+              'Invalid response format or authorization failed: ${jsonResponse['message'] ?? "No message"}');
         }
+
+        final taskData = jsonResponse['data'];
+
+        if (taskData == null || taskData is! List) {
+          throw Exception('Task data is missing or invalid.');
+        }
+
+        _taskList = taskData
+            .where((task) =>
+                task['createdBy'] != null &&
+                task['createdBy']['_id'] ==
+                    userId) // Filter tasks created by the user
+            .map((task) => Task.fromJson(task))
+            .toList();
+
+        notifyListeners();
       } else {
-        throw Exception('Failed to fetch tasks: ${response.reasonPhrase}');
+        throw Exception(
+            'Failed to fetch tasks: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
+      print('Error fetching tasks: $e');
       throw Exception('Error fetching tasks: $e');
     }
   }
 
   Future<void> createTask(
-      String title,
-      String description,
-      String jobType,
-      String empId,
-      ) async {
+    String title,
+    String description,
+    String jobType,
+    String empId,
+  ) async {
     final token = await _getToken();
     final managerId = await _getUserId();
 
     if (token == null || managerId == null) {
-      throw Exception('Token or Manager ID not found. User may not be logged in.');
+      throw Exception(
+          'Token or Manager ID not found. User may not be logged in.');
     }
 
     try {

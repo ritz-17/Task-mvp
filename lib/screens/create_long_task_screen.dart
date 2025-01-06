@@ -7,6 +7,7 @@ import 'package:task_mvp/provider/task_provider.dart';
 import 'package:task_mvp/utils/utils.dart';
 
 import '../provider/employee_provider.dart';
+import 'employee_task_screen.dart';
 
 class CreateLongTask extends StatefulWidget {
   const CreateLongTask({super.key});
@@ -237,29 +238,40 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                             ),
                           ),
                           ElevatedButton(
+                            // Inside your onPressed method
                             onPressed: () async {
-                              final SharedPreferences prefs =
-                                  await SharedPreferences.getInstance();
                               try {
                                 final taskProvider = Provider.of<TaskProvider>(
                                     context,
                                     listen: false);
+
+                                // Call the createTask method
                                 await taskProvider.createTask(
-                                    titleController.text,
-                                    descController.text,
-                                    "long",selectedMember!);
+                                  titleController.text,
+                                  descController.text,
+                                  "long", // Assuming this is for long tasks
+                                  selectedMember!,
+                                );
+
+                                // Show success message
                                 showSnackBar(
                                     context, 'Task created successfully');
-                                Navigator.pushReplacementNamed(
-                                    context, '/employeeTasks');
-                                print('task created');
+
+                                // Navigate to the employee task page
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => EmployeeTaskPage()),
+                                );
+
+                                print('Task created');
                               } catch (e) {
                                 print(e);
                                 showSnackBar(
                                     context, "Error creating task: $e");
                               }
-                              Navigator.pop(context);
                             },
+
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(context).primaryColor,
                             ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mvp/provider/task_provider.dart';
 import '../provider/employee_provider.dart';
 import '../utils/utils.dart';
@@ -118,71 +117,32 @@ class _CreateShortTaskState extends State<CreateShortTask> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (selectedMember == null) {
                       showSnackBar(context, "Please select a member.");
                       return;
                     }
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Confirm Task Creation"),
-                        content: const Text(
-                          "Are you sure you want to create this task? You can recheck the details before confirming.",
-                        ),
-                        actions: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                                width: 2,
-                              ),
-                            ),
-                            child: Text(
-                              "No, Recheck",
-                              style: TextStyle(
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                final taskProvider = Provider.of<TaskProvider>(
-                                    context,
-                                    listen: false);
-                                await taskProvider.createTask(
-                                  titleController.text,
-                                  descController.text,
-                                  "short",
-                                  selectedMember!
-                                );
 
-                                // Show success message
-                                showSnackBar(
-                                    context, 'Task created successfully');
-                                Navigator.pushReplacementNamed(
-                                    context, '/employeeTasks');
-                              } catch (e) {
-                                showSnackBar(
-                                    context, "Error creating task: $e");
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                            ),
-                            child: const Text(
-                              "Confirm",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
+                    try {
+                      final taskProvider =
+                          Provider.of<TaskProvider>(context, listen: false);
+                      await taskProvider.createTask(
+                        titleController.text,
+                        descController.text,
+                        "short",
+                        selectedMember!,
+                      );
+
+                      // Show success message
+                      showSnackBar(context, 'Task created successfully');
+
+                      // Navigate to the employee tasks screen
+                      Navigator.pushReplacementNamed(context, '/employeeTasks');
+                    } catch (e) {
+                      showSnackBar(context, "Error creating task: $e");
+                      print("====================================");
+                      print(e);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
