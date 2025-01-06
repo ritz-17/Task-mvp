@@ -47,14 +47,17 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     // --------------------------------------- UI Layout ------------------------------------
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Employee List'),
+        title: const Text(
+          'Employee List',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
       body: employeeProvider.isLoading
           ? const Center(
               child: CircularProgressIndicator()) // Show loading indicator
           : SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.03),
+              padding: EdgeInsets.all(screenWidth * 0.03),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -84,44 +87,47 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     double screenWidth,
     double screenHeight,
   ) {
-    return Card(
-      elevation: 4,
-      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(screenWidth * 0.03),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(screenHeight * 0.02),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --------------------------- Section Title ---------------------------
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: screenHeight * 0.022,
-                fontWeight: FontWeight.bold,
+    return Center(
+      child: Card(
+        elevation: 4,
+        margin: EdgeInsets.all(screenHeight * 0.01),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(screenWidth * 0.03),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(screenHeight * 0.015),
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Center content here
+            children: [
+              // --------------------------- Section Title ---------------------------
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: screenHeight * 0.022,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: screenHeight * 0.01),
+              SizedBox(height: screenHeight * 0.01),
 
-            // ---------------------- Employee Cards in Wrap -----------------------
-            Wrap(
-              spacing: screenWidth * 0.04,
-              runSpacing: screenHeight * 0.02,
-              children: members
-                  .map((member) =>
-                      _buildMemberCard(member, screenWidth, screenHeight))
-                  .toList(),
-            ),
-          ],
+              // ---------------------- Employee Cards in Wrap -----------------------
+              Wrap(
+                alignment:
+                    WrapAlignment.center, // Center the items inside the Wrap
+                spacing: screenWidth * 0.04,
+                runSpacing: screenHeight * 0.02,
+                children: members
+                    .map((member) =>
+                        _buildMemberCard(member, screenWidth, screenHeight))
+                    .toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // ----------------------------------- Member Card Builder ---------------------------------
-  // Builds individual employee cards with avatar and status indicator
   Widget _buildMemberCard(
       Employee member, double screenWidth, double screenHeight) {
     // ----------------------- Determine Status Color ---------------------------
@@ -142,6 +148,9 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
     // -------------------------- Member Card Layout ---------------------------
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+      crossAxisAlignment:
+          CrossAxisAlignment.center, // Center content horizontally
       children: [
         Stack(
           alignment: Alignment.bottomRight,
