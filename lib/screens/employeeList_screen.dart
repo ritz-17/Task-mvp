@@ -18,7 +18,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     // Load employee data when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final employeeProvider =
-          Provider.of<EmployeeProvider>(context, listen: false);
+      Provider.of<EmployeeProvider>(context, listen: false);
       employeeProvider.loadEmployees();
     });
   }
@@ -27,8 +27,14 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   Widget build(BuildContext context) {
     // ----------------------------------- Screen Dimensions --------------------------------
     // Get the dimensions of the screen for responsive UI
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    final screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     // ----------------------------------- Employee Provider --------------------------------
     // Access the EmployeeProvider for data
@@ -38,11 +44,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     // Categorize employees based on their status
     final employees = employeeProvider.employees;
     final activeMembers =
-        employees.where((member) => member.status == 'active').toList();
+    employees.where((member) => member.status == 'active').toList();
     final freeMembers =
-        employees.where((member) => member.status == 'free').toList();
+    employees.where((member) => member.status == 'free').toList();
     final unavailableMembers =
-        employees.where((member) => member.status == 'unavailable').toList();
+    employees.where((member) => member.status == 'unavailable').toList();
 
     // --------------------------------------- UI Layout ------------------------------------
     return Scaffold(
@@ -55,50 +61,50 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
       ),
       body: employeeProvider.isLoading
           ? const Center(
-              child: CircularProgressIndicator()) // Show loading indicator
+          child: CircularProgressIndicator()) // Show loading indicator
           : SingleChildScrollView(
-              padding: EdgeInsets.all(screenWidth * 0.03),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ---------------------- Active Members Section ----------------------
-                  _buildSection("Active Members", activeMembers, screenWidth,
-                      screenHeight),
-                  SizedBox(height: screenHeight * 0.03),
+        padding: EdgeInsets.all(screenWidth * 0.03),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ---------------------- Active Members Section ----------------------
+            _buildSection("Active Members", activeMembers, screenWidth,
+                screenHeight),
+            SizedBox(height: screenHeight * 0.03),
 
-                  // ------------------------ Free Members Section ----------------------
-                  _buildSection("Free", freeMembers, screenWidth, screenHeight),
-                  SizedBox(height: screenHeight * 0.03),
+            // ------------------------ Free Members Section ----------------------
+            _buildSection("Free", freeMembers, screenWidth, screenHeight),
+            SizedBox(height: screenHeight * 0.03),
 
-                  // -------------------- Unavailable Members Section -------------------
-                  _buildSection("Unavailable", unavailableMembers, screenWidth,
-                      screenHeight),
-                ],
-              ),
-            ),
+            // -------------------- Unavailable Members Section -------------------
+            _buildSection("Unavailable", unavailableMembers, screenWidth,
+                screenHeight),
+          ],
+        ),
+      ),
     );
   }
 
   // ------------------------------------ Section Builder ------------------------------------
   // Builds each section of employees (Active, Free, Unavailable)
   Widget _buildSection(
-    String title,
-    List<Employee> members,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    return Center(
+      String title,
+      List<Employee> members,
+      double screenWidth,
+      double screenHeight,
+      ) {
+    return Container(
+      width: screenWidth,
+      margin: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
       child: Card(
         elevation: 4,
-        margin: EdgeInsets.all(screenHeight * 0.01),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(screenWidth * 0.03),
         ),
         child: Padding(
           padding: EdgeInsets.all(screenHeight * 0.015),
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // Center content here
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // --------------------------- Section Title ---------------------------
               Text(
@@ -112,13 +118,12 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
               // ---------------------- Employee Cards in Wrap -----------------------
               Wrap(
-                alignment:
-                    WrapAlignment.center, // Center the items inside the Wrap
+                alignment: WrapAlignment.start,
                 spacing: screenWidth * 0.04,
                 runSpacing: screenHeight * 0.02,
                 children: members
                     .map((member) =>
-                        _buildMemberCard(member, screenWidth, screenHeight))
+                    _buildMemberCard(member, screenWidth, screenHeight))
                     .toList(),
               ),
             ],
@@ -128,8 +133,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     );
   }
 
-  Widget _buildMemberCard(
-      Employee member, double screenWidth, double screenHeight) {
+
+
+  Widget _buildMemberCard(Employee member, double screenWidth,
+      double screenHeight) {
     // ----------------------- Determine Status Color ---------------------------
     Color statusColor;
     switch (member.status) {
@@ -150,7 +157,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
       crossAxisAlignment:
-          CrossAxisAlignment.center, // Center content horizontally
+      CrossAxisAlignment.center, // Center content horizontally
       children: [
         Stack(
           alignment: Alignment.bottomRight,

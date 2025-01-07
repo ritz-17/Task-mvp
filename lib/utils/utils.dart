@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,6 +10,13 @@ void showSnackBar(BuildContext context, String content) {
       content: Text(content),
     ),
   );
+}
+
+List<String> encodeImagesToBase64(List<File?> images) {
+  return images
+      .where((image) => image != null) // Filter out null values
+      .map((image) => base64Encode(image!.readAsBytesSync()))
+      .toList();
 }
 
 Widget buildTeamSection(

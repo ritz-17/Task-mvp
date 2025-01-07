@@ -127,11 +127,13 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                       final taskProvider =
                           Provider.of<TaskProvider>(context, listen: false);
                       await taskProvider.createTask(
-                        titleController.text,
-                        descController.text,
-                        "short",
-                        selectedMember!,
-                      );
+                          titleController.text,
+                          descController.text,
+                          "long",
+                          selectedMember!,
+                          " ",
+                          [],
+                          "");
 
                       // Show success message
                       showSnackBar(context, 'Task created successfully');

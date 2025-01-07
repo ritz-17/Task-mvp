@@ -1,11 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_mvp/provider/auth_provider.dart';
 
 import '../utils/utils.dart';
 import 'choose_task_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  late Future<SharedPreferences> _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final employeeProvider =
+          Provider.of<AuthProvider>(context, listen: false);
+      employeeProvider.checkAuth();
+    });
+    _prefs = SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +159,8 @@ class DashboardScreen extends StatelessWidget {
                                 children: [
                                   //----------------- Add Task Image------------------
                                   Image.asset(
-                                    'assets/add_task.png', // Replace with your actual image path
+                                    'assets/add_task.png',
+                                    // Replace with your actual image path
                                     width: screenWidth * 0.15,
                                     height: screenWidth * 0.15,
                                   ),

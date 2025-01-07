@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "566298561043",
+    "project_id": "task-mvp-36e6d",
+    "storage_bucket": "task-mvp-36e6d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566298561043:android:9f68ed7fa883fb46738de6",
+        "android_client_info": {
+          "package_name": "com.example.task_mvp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDIdJ0OL8_ovC8ZrRc4jDbE8F5q_qX4eeQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -31,7 +31,6 @@ class _SplashScreenState extends State<SplashScreen>
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
     );
-    // Handle navigation
     _navigateAfterDelay();
   }
 
@@ -48,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
         context,
         MaterialPageRoute(
           builder: (context) =>
-              isSignedIn ? const NavBar() : const LoginOption(),
+          isSignedIn ? const NavBar() : const LoginOption(),
         ),
       );
     }

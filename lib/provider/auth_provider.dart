@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -16,22 +18,24 @@ class AuthProvider extends ChangeNotifier {
 
   // Public getters
   bool get isSignedIn => _isSignedIn;
+
   String? get token => _token;
+
   String? get role => _role;
 
   // Setters
   Future<void> setRole(String role) async {
     _role = role;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('role', _role!);
+    await prefs.setString('role', role);
     notifyListeners();
     debugPrint('Role set to: $role');
   }
 
-
   // Check if user is signed in
   Future<bool> checkIfSignedIn() async {
     _token = await _secureStorage.read(key: 'token');
+    print(_token);
     _isSignedIn = _token != null;
     notifyListeners();
     debugPrint('Sign-in status checked. isSignedIn: $_isSignedIn');
@@ -43,19 +47,13 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _isSignedIn = prefs.getBool('isSignedIn') ?? false;
     _token = await _secureStorage.read(key: 'token');
-    final savedRole = prefs.getString('role');
-    if (savedRole != null && savedRole.isNotEmpty) {
-      // await checkAuth();
-    } else {
-      _role = null;
-    }
     notifyListeners();
-    debugPrint('Auth state initialized. isSignedIn: $_isSignedIn, role: $_role');
+    debugPrint(
+        'Auth state initialized. isSignedIn: $_isSignedIn, role:$_role');
   }
 
-
   // Check authorization
-  Future<void> checkAuth() async {
+  Future<int> checkAuth() async {
     if (_role == null || _role!.isEmpty) {
       throw Exception('Role is not defined. Cannot check authorization.');
     }
@@ -68,7 +66,7 @@ class AuthProvider extends ChangeNotifier {
         Uri.parse(checkUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Token $_token',
+          'Authorization': 'Token $token',
         },
       );
 
@@ -87,30 +85,30 @@ class AuthProvider extends ChangeNotifier {
           await prefs.setString('updatedAt', user.updatedAt);
 
           debugPrint('User details stored successfully: ${user.toString()}');
-          notifyListeners();
         } else {
           throw Exception('Authorization failed: ${jsonResponse['message']}');
         }
       } else {
         throw Exception('Failed to fetch $role: ${response.reasonPhrase}');
       }
+      notifyListeners();
+      return response.statusCode;
     } catch (e) {
-      debugPrint('Authorization exception: $e');
       throw Exception('Authorization exception: $e');
     }
   }
 
   // Register method
   Future<void> register(
-      String email,
-      String phone,
-      String firstName,
-      String lastName,
-      String type,
-      String password,
-      String dateOfBirth,
-      String address,
-      ) async {
+    String email,
+    String phone,
+    String firstName,
+    String lastName,
+    String type,
+    String password,
+    String dateOfBirth,
+    String address,
+  ) async {
     if (_role == null || _role!.isEmpty) {
       throw Exception('Role is not set. Cannot proceed with registration.');
     }
@@ -164,10 +162,10 @@ class AuthProvider extends ChangeNotifier {
 
   // Login method
   Future<void> login(
-      String email,
-      String type,
-      String password,
-      ) async {
+    String email,
+    String type,
+    String password,
+  ) async {
     if (_role == null || _role!.isEmpty) {
       throw Exception('Role is not set. Cannot proceed with login.');
     }

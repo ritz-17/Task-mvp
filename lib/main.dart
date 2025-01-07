@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:task_mvp/provider/auth_provider.dart';
 import 'package:task_mvp/provider/timer_provider.dart';
@@ -12,7 +11,7 @@ import 'package:task_mvp/screens/login_screen.dart';
 import 'package:task_mvp/screens/signup_screen.dart';
 import 'package:task_mvp/screens/profile_screen.dart';
 import 'package:task_mvp/screens/dashboard_screen.dart';
-import 'package:task_mvp/screens/employee_task_screen.dart';
+import 'package:task_mvp/screens/task_list_screen.dart';
 import 'package:task_mvp/screens/verification_screen.dart';
 import 'package:task_mvp/screens/verified_screen.dart';
 import 'package:task_mvp/screens/forgot_password_screen.dart';
@@ -21,7 +20,7 @@ import 'screens/create_short_task_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
+  // await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

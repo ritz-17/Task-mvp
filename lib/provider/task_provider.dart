@@ -9,7 +9,7 @@ import '../models/task_model.dart';
 
 class TaskProvider extends ChangeNotifier {
   List<Task> _taskList = [];
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   List<Task> get taskList => _taskList;
 
@@ -48,47 +48,34 @@ class TaskProvider extends ChangeNotifier {
         },
       );
 
-      print('Fetch Task Response: ${response.body}'); // Debugging
-
+      // working till here!!!
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-        if (jsonResponse == null || jsonResponse['success'] != true) {
-          throw Exception(
-              'Invalid response format or authorization failed: ${jsonResponse['message'] ?? "No message"}');
+        if (jsonResponse['success'] == true) {
+          // Ensure the 'data' field is a List<Map<String, dynamic>>
+          final List<dynamic> taskData = jsonResponse['data'];
+          print(taskData);
+          // Safely map data to Task objects
+          _taskList = taskData
+              .map((e) => Task.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
+          print(_taskList);
+
+          notifyListeners();
+        } else {
+          throw Exception('Authorization failed: ${jsonResponse['message']}');
         }
-
-        final taskData = jsonResponse['data'];
-
-        if (taskData == null || taskData is! List) {
-          throw Exception('Task data is missing or invalid.');
-        }
-
-        _taskList = taskData
-            .where((task) =>
-                task['createdBy'] != null &&
-                task['createdBy']['_id'] ==
-                    userId) // Filter tasks created by the user
-            .map((task) => Task.fromJson(task))
-            .toList();
-
-        notifyListeners();
       } else {
-        throw Exception(
-            'Failed to fetch tasks: ${response.statusCode} ${response.reasonPhrase}');
+        throw Exception('Failed to fetch tasks: ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Error fetching tasks: $e');
       throw Exception('Error fetching tasks: $e');
     }
   }
 
-  Future<void> createTask(
-    String title,
-    String description,
-    String jobType,
-    String empId,
-  ) async {
+  Future<void> createTask(String title, String description, String jobType,
+      String empId, String priority, List attachments, String voice) async {
     final token = await _getToken();
     final managerId = await _getUserId();
 
@@ -110,6 +97,9 @@ class TaskProvider extends ChangeNotifier {
           'jobType': jobType,
           'assignedTo': empId,
           'createdBy': managerId,
+          'attachments': attachments,
+          'voice': voice,
+          'priority': priority
         }),
       );
 
@@ -122,8 +112,6 @@ class TaskProvider extends ChangeNotifier {
           'Failed to create task: ${data['error'] ?? response.reasonPhrase}',
         );
       }
-    } catch (e) {
-      throw Exception('Error creating task: $e');
-    }
+    } catch (e) {}
   }
 }

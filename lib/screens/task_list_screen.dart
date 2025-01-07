@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../provider/task_provider.dart';
-import '../models/task_model.dart';
 
 class EmployeeTaskPage extends StatefulWidget {
   const EmployeeTaskPage({super.key});
@@ -16,7 +15,8 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
     super.initState();
     // Fetch tasks when the screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TaskProvider>(context, listen: false).fetchTaskList();
+      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+      taskProvider.fetchTaskList();
     });
   }
 
@@ -58,7 +58,7 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
 
               return Card(
                 margin:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                 child: ListTile(
                   title: Text(
                     task.title,
@@ -72,8 +72,13 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
                     children: [
                       Text("Description: ${task.description}"),
                       Text("Status: ${task.status}"),
+                      Text("Assigned To: ${task.assignedTo.user.firstName} ${task.assignedTo.user.lastName}"),
                     ],
                   ),
+                  trailing: const Icon(Icons.arrow_forward),
+                  onTap: () {
+                    // Navigate to a detailed view or handle task actions here
+                  },
                 ),
               );
             },

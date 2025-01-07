@@ -2,12 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mvp/provider/task_provider.dart';
+import 'package:task_mvp/screens/task_list_screen.dart';
 import 'package:task_mvp/utils/utils.dart';
 
 import '../provider/employee_provider.dart';
-import 'employee_task_screen.dart';
 
 class CreateLongTask extends StatefulWidget {
   const CreateLongTask({super.key});
@@ -19,7 +18,6 @@ class CreateLongTask extends StatefulWidget {
 class _CreateLongTaskState extends State<CreateLongTask> {
   String? selectedMember;
   String? selectedPriority;
-  String? managerId;
   final titleController = TextEditingController();
   final descController = TextEditingController();
 
@@ -30,6 +28,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
     super.dispose();
   }
 
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -47,6 +46,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
     // Filter lists based on status
     final freeMembers = Provider.of<EmployeeProvider>(context).freeMembers;
 
@@ -245,25 +245,28 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                                     context,
                                     listen: false);
 
+                                // Convert images to Base64
+                                final encodedAttachments =
+                                    encodeImagesToBase64(_selectedImages);
+                                print(encodedAttachments);
+
                                 // Call the createTask method
                                 await taskProvider.createTask(
-                                  titleController.text,
-                                  descController.text,
-                                  "long", // Assuming this is for long tasks
-                                  selectedMember!,
+                                    titleController.text,
+                                    descController.text,
+                                    "long",
+                                    selectedMember!,
+                                    selectedPriority!,
+                                    encodedAttachments,
+                                    ""
                                 );
-
-                                // Show success message
                                 showSnackBar(
                                     context, 'Task created successfully');
-
-                                // Navigate to the employee task page
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => EmployeeTaskPage()),
                                 );
-
                                 print('Task created');
                               } catch (e) {
                                 print(e);
