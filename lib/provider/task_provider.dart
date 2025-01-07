@@ -54,8 +54,7 @@ class TaskProvider extends ChangeNotifier {
         final jsonResponse = jsonDecode(response.body);
 
         if (jsonResponse == null || jsonResponse['success'] != true) {
-          throw Exception(
-              'Invalid response format or authorization failed: ${jsonResponse['message'] ?? "No message"}');
+          throw Exception('Invalid response format or authorization failed');
         }
 
         final taskData = jsonResponse['data'];
@@ -87,8 +86,11 @@ class TaskProvider extends ChangeNotifier {
     String title,
     String description,
     String jobType,
-    String empId,
-  ) async {
+    String empId, 
+    String priority,{
+    String? audioBase64,
+    List<String>? encodedAttachments, 
+  }) async {
     final token = await _getToken();
     final managerId = await _getUserId();
 
@@ -98,29 +100,37 @@ class TaskProvider extends ChangeNotifier {
     }
 
     try {
+      // Prepare the task data
+      final taskData = {
+        'title': title,
+        'description': description,
+        'jobType': jobType,
+        'assignedTo': empId,
+        'createdBy': managerId,
+        if (audioBase64 != null && audioBase64.isNotEmpty)
+          'voice': audioBase64, // Include voice if provided
+        if (encodedAttachments != null && encodedAttachments.isNotEmpty)
+          'attachments': encodedAttachments, // Include attachments if provided
+      };
+
       final response = await http.post(
         Uri.parse('$baseUrl/task'),
         headers: {
           'Authorization': 'Token $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          'title': title,
-          'description': description,
-          'jobType': jobType,
-          'assignedTo': empId,
-          'createdBy': managerId,
-        }),
+        body: jsonEncode(taskData),
       );
 
       final data = jsonDecode(response.body);
+
       if (response.statusCode == 201) {
         print('Task created successfully: $data');
+        print(data);
         await fetchTaskList();
       } else {
         throw Exception(
-          'Failed to create task: ${data['error'] ?? response.reasonPhrase}',
-        );
+            'Failed to create task: ${data['error'] ?? response.reasonPhrase}');
       }
     } catch (e) {
       throw Exception('Error creating task: $e');

@@ -1,8 +1,6 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_mvp/provider/task_provider.dart';
 import 'package:task_mvp/utils/utils.dart';
 
@@ -19,9 +17,12 @@ class CreateLongTask extends StatefulWidget {
 class _CreateLongTaskState extends State<CreateLongTask> {
   String? selectedMember;
   String? selectedPriority;
-  String? managerId;
   final titleController = TextEditingController();
   final descController = TextEditingController();
+
+  final List<File?> _selectedImages = [null, null, null];
+  final List<bool> _isUploading = [false, false, false];
+  final List<String> priorities = ['High', 'Medium', 'Low'];
 
   @override
   void dispose() {
@@ -30,29 +31,24 @@ class _CreateLongTaskState extends State<CreateLongTask> {
     super.dispose();
   }
 
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final employeeProvider =
-          Provider.of<EmployeeProvider>(context, listen: false);
-      employeeProvider.loadEmployees();
+      Provider.of<EmployeeProvider>(context, listen: false).loadEmployees();
     });
   }
-
-  final List<File?> _selectedImages = [null, null, null];
-  final List<bool> _isUploading = [false, false, false];
-  final List<String> priorities = ['High', 'Medium', 'Low'];
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    // Filter lists based on status
+
     final freeMembers = Provider.of<EmployeeProvider>(context).freeMembers;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create New Task"),
+        title: const Text("Create Long Task"),
         centerTitle: true,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
@@ -64,16 +60,16 @@ class _CreateLongTaskState extends State<CreateLongTask> {
           padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(height: screenHeight * 0.02),
+
+              // Attachments Section
               const Text(
-                "Attachments",
+                "Attachments (Max 3)",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: screenHeight * 0.01),
               const Text(
-                "Format should be in .pdf, .jpeg, .png less than 5MB",
+                "Formats: PDF, JPEG, PNG (Max: 5MB each)",
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               SizedBox(height: screenHeight * 0.015),
@@ -95,9 +91,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: Theme.of(context).primaryColor,
-                          width: _isUploading[index]
-                              ? 3
-                              : 1, // Thicker border during upload
+                          width: _isUploading[index] ? 3 : 1,
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -124,23 +118,24 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                   ),
                 ),
               ),
+
               SizedBox(height: screenHeight * 0.03),
 
-              // Task Title Input
+              // Task Title
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
-                  prefixIcon:
-                      Icon(Icons.title, color: Theme.of(context).primaryColor),
+                  prefixIcon: Icon(Icons.title,
+                      color: Theme.of(context).primaryColor),
                   hintText: "Enter Task Title",
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
 
-              // Task Description Input
+              // Task Description
               TextField(
                 controller: descController,
                 maxLines: 4,
@@ -153,22 +148,18 @@ class _CreateLongTaskState extends State<CreateLongTask> {
               ),
               SizedBox(height: screenHeight * 0.02),
 
-              // Assign To Dropdown
+              // Member Selection
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
-                  prefixIcon:
-                      Icon(Icons.person, color: Theme.of(context).primaryColor),
-                  border: OutlineInputBorder(
+                  prefixIcon: Icon(Icons.person,
+                      color: Theme.of(context).primaryColor),
+                  border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                 ),
                 hint: const Text("Select Member"),
                 value: selectedMember,
-                onChanged: (value) {
-                  setState(() {
-                    selectedMember = value;
-                  });
-                },
+                onChanged: (value) => setState(() => selectedMember = value),
                 items: freeMembers
                     .map((employee) => DropdownMenuItem(
                           value: employee.id,
@@ -179,22 +170,18 @@ class _CreateLongTaskState extends State<CreateLongTask> {
               ),
               SizedBox(height: screenHeight * 0.02),
 
-              // Priority Dropdown
+              // Priority Selection
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.priority_high,
                       color: Theme.of(context).primaryColor),
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                 ),
                 hint: const Text("Select Priority"),
                 value: selectedPriority,
-                onChanged: (value) {
-                  setState(() {
-                    selectedPriority = value;
-                  });
-                },
+                onChanged: (value) => setState(() => selectedPriority = value),
                 items: priorities
                     .map((priority) => DropdownMenuItem(
                           value: priority,
@@ -202,101 +189,52 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                         ))
                     .toList(),
               ),
+
               SizedBox(height: screenHeight * 0.03),
 
               // Create Task Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Confirm Task Creation"),
-                        content: const Text(
-                          "Are you sure you want to create this task? You can recheck the details before confirming.",
-                        ),
-                        actions: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: BorderSide(
-                                // Outline border
-                                color: Theme.of(context).primaryColor,
-                                width: 2, // Border width
-                              ),
-                            ),
-                            child: Text(
-                              "No, Recheck",
-                              style: TextStyle(
-                                color: Theme.of(context)
-                                    .primaryColor, // Text color matches border
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            // Inside your onPressed method
-                            onPressed: () async {
-                              try {
-                                final taskProvider = Provider.of<TaskProvider>(
-                                    context,
-                                    listen: false);
+              ElevatedButton(
+                onPressed: () async {
+                  if (selectedMember == null || selectedPriority == null) {
+                    showSnackBar(context, "Please complete all fields.");
+                    return;
+                  }
 
-                                // Call the createTask method
-                                await taskProvider.createTask(
-                                  titleController.text,
-                                  descController.text,
-                                  "long", // Assuming this is for long tasks
-                                  selectedMember!,
-                                );
+                  try {
+                    final taskProvider =
+                        Provider.of<TaskProvider>(context, listen: false);
+                    final encodedAttachments =
+                        encodeImagesToBase64(_selectedImages);
 
-                                // Show success message
-                                showSnackBar(
-                                    context, 'Task created successfully');
+                    await taskProvider.createTask(
+                      titleController.text,
+                      descController.text,
+                      "long",
+                      selectedMember!,
+                      selectedPriority!,
+                      encodedAttachments: encodedAttachments,
+                    );
 
-                                // Navigate to the employee task page
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => EmployeeTaskPage()),
-                                );
-
-                                print('Task created');
-                              } catch (e) {
-                                print(e);
-                                showSnackBar(
-                                    context, "Error creating task: $e");
-                              }
-                            },
-
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).primaryColor,
-                            ),
-                            child: const Text(
-                              "Confirm",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
+                    showSnackBar(context, "Task created successfully!");
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const EmployeeTaskPage(),
                       ),
                     );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-                  ),
-                  child: const Text(
-                    "Create Task",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  } catch (e) {
+                    showSnackBar(context, "Error: $e");
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
+                child: const Text("Create Task",
+                    style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

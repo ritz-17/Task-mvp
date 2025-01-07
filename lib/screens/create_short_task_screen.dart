@@ -1,6 +1,13 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:task_mvp/provider/task_provider.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:path/path.dart' as p;
+
 import '../provider/employee_provider.dart';
 import '../utils/utils.dart';
 
@@ -16,16 +23,25 @@ class _CreateShortTaskState extends State<CreateShortTask> {
   final titleController = TextEditingController();
   final descController = TextEditingController();
 
+  final AudioRecorder audioRecorder = AudioRecorder();
+  final AudioPlayer audioPlayer = AudioPlayer();
+
+  bool isRecording = false, isPlaying = false;
+  String? recordingPath, recordingBase64;
+  String? audioPath;
+
   @override
   void dispose() {
     titleController.dispose();
     descController.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    super.initState(); // Retrieve manager's ID
+    super.initState();
+    // Retrieve manager's ID
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final employeeProvider =
           Provider.of<EmployeeProvider>(context, listen: false);
@@ -111,6 +127,72 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                     .toList(),
               ),
 
+              SizedBox(height: screenHeight * 0.02),
+
+              // ------------------------- Record Audio Button ------------------------
+              FloatingActionButton.extended(
+                onPressed: () async {
+                  if (isRecording) {
+                    // Stop recording
+                    final filePath = await audioRecorder.stop();
+                    if (filePath != null) {
+                      final fileBytes = await File(filePath).readAsBytes();
+                      final base64Audio = base64Encode(fileBytes);
+
+                      setState(() {
+                        isRecording = false;
+                        recordingPath = filePath;
+                        recordingBase64 =
+                            base64Audio; // Save Base64 audio string
+                      });
+
+                      showSnackBar(context, "Recording saved.");
+                    }
+                  } else {
+                    if (await audioRecorder.hasPermission()) {
+                      final Directory appDir =
+                          await getApplicationDocumentsDirectory();
+                      final String audioPath =
+                          p.join(appDir.path, "task_audio.wav");
+                      await audioRecorder.start(const RecordConfig(),
+                          path: audioPath);
+
+                      setState(() {
+                        isRecording = true;
+                        recordingPath = null;
+                      });
+
+                      showSnackBar(context, "Recording started...");
+                    }
+                  }
+                },
+                label: Text(isRecording ? "Stop Recording" : "Start Recording"),
+                icon: Icon(isRecording ? Icons.stop : Icons.mic),
+              ),
+
+              if (recordingPath != null) ...[
+                SizedBox(height: screenHeight * 0.02),
+
+                // ------------------------- Play Audio Button ------------------------
+                ElevatedButton(
+                  onPressed: () async {
+                    if (isPlaying) {
+                      await audioPlayer.stop();
+                      setState(() {
+                        isPlaying = false;
+                      });
+                    } else {
+                      await audioPlayer.setFilePath(recordingPath!);
+                      await audioPlayer.play();
+                      setState(() {
+                        isPlaying = true;
+                      });
+                    }
+                  },
+                  child: Text(isPlaying ? "Stop Playback" : "Play Recording"),
+                ),
+              ],
+
               SizedBox(height: screenHeight * 0.03),
 
               // -------------------------- Create Task Button -------------------------
@@ -131,6 +213,8 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                         descController.text,
                         "short",
                         selectedMember!,
+                        "high",
+                        audioBase64: recordingBase64, // Send audio as Base64
                       );
 
                       // Show success message
