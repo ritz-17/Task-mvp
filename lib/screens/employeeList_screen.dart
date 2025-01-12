@@ -1,84 +1,125 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:task_mvp/models/employee_model.dart';
+import 'package:task_mvp/provider/employee_provider.dart';
 
 class EmployeeScreen extends StatefulWidget {
-  const EmployeeScreen({super.key});
+  const EmployeeScreen({Key? key}) : super(key: key);
 
   @override
   State<EmployeeScreen> createState() => _EmployeeScreenState();
 }
 
 class _EmployeeScreenState extends State<EmployeeScreen> {
-  final List<Map<String, dynamic>> allMembers = [
-    {"name": "Chad", "image": "https://i.pravatar.cc/150?img=1", "status": "active"},
-    {"name": "Matt", "image": "https://i.pravatar.cc/150?img=2", "status": "active"},
-    {"name": "Julie", "image": "https://i.pravatar.cc/150?img=3", "status": "active"},
-    {"name": "Chad", "image": "https://i.pravatar.cc/150?img=1", "status": "active"},
-    {"name": "Matt", "image": "https://i.pravatar.cc/150?img=2", "status": "active"},
-    {"name": "Julie", "image": "https://i.pravatar.cc/150?img=3", "status": "active"},
-    {"name": "Yuri", "image": "https://i.pravatar.cc/150?img=4", "status": "free"},
-    {"name": "Chad", "image": "https://i.pravatar.cc/150?img=5", "status": "free"},
-    {"name": "Matt", "image": "https://i.pravatar.cc/150?img=6", "status": "unavailable"},
-    {"name": "Julie", "image": "https://i.pravatar.cc/150?img=7", "status": "unavailable"},
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // ---------------------------------- Load Employees ------------------------------------
+    // Load employee data when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final employeeProvider =
+          Provider.of<EmployeeProvider>(context, listen: false);
+      employeeProvider.loadEmployees();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // ----------------------------------- Screen Dimensions --------------------------------
+    // Get the dimensions of the screen for responsive UI
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Filter lists based on status
-    final activeMembers = allMembers.where((member) => member['status'] == 'active').toList();
-    final freeMembers = allMembers.where((member) => member['status'] == 'free').toList();
-    final unavailableMembers = allMembers.where((member) => member['status'] == 'unavailable').toList();
+    // ----------------------------------- Employee Provider --------------------------------
+    // Access the EmployeeProvider for data
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
 
+    // ----------------------------------- Filtered Employees -------------------------------
+    // Categorize employees based on their status
+    final employees = employeeProvider.employees;
+    final activeMembers =
+        employees.where((member) => member.status == 'active').toList();
+    final freeMembers =
+        employees.where((member) => member.status == 'free').toList();
+    final unavailableMembers =
+        employees.where((member) => member.status == 'unavailable').toList();
+
+    // --------------------------------------- UI Layout ------------------------------------
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Employee List'),
+        title: const Text(
+          'Employee List',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSection("Active Members", activeMembers, screenWidth, screenHeight),
-            SizedBox(height: screenHeight * 0.02),
-            _buildSection("Free", freeMembers, screenWidth, screenHeight),
-            SizedBox(height: screenHeight * 0.02),
-            _buildSection("Unavailable", unavailableMembers, screenWidth, screenHeight),
-          ],
-        ),
-      ),
+      body: employeeProvider.isLoading
+          ? const Center(
+              child: CircularProgressIndicator()) // Show loading indicator
+          : SingleChildScrollView(
+              padding: EdgeInsets.all(screenWidth * 0.03),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ---------------------- Active Members Section ----------------------
+                  _buildSection("Active Members", activeMembers, screenWidth,
+                      screenHeight),
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // ------------------------ Free Members Section ----------------------
+                  _buildSection("Free", freeMembers, screenWidth, screenHeight),
+                  SizedBox(height: screenHeight * 0.03),
+
+                  // -------------------- Unavailable Members Section -------------------
+                  _buildSection("Unavailable", unavailableMembers, screenWidth,
+                      screenHeight),
+                ],
+              ),
+            ),
     );
   }
 
+  // ------------------------------------ Section Builder ------------------------------------
+  // Builds each section of employees (Active, Free, Unavailable)
   Widget _buildSection(
-      String title,
-      List<Map<String, dynamic>> members,
-      double screenWidth,
-      double screenHeight,
-      ) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: SizedBox(
-        width: screenWidth * 0.95, // Stretching card width
+    String title,
+    List<Employee> members,
+    double screenWidth,
+    double screenHeight,
+  ) {
+    return Center(
+      child: Card(
+        elevation: 4,
+        margin: EdgeInsets.all(screenHeight * 0.01),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(screenWidth * 0.03),
+        ),
         child: Padding(
-          padding: EdgeInsets.all(screenHeight * 0.02),
+          padding: EdgeInsets.all(screenHeight * 0.015),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Center content here
             children: [
+              // --------------------------- Section Title ---------------------------
               Text(
                 title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: screenHeight * 0.022,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(height: screenHeight * 0.01),
+
+              // ---------------------- Employee Cards in Wrap -----------------------
               Wrap(
+                alignment:
+                    WrapAlignment.center, // Center the items inside the Wrap
                 spacing: screenWidth * 0.04,
                 runSpacing: screenHeight * 0.02,
-                children: members.map((member) => _buildMemberCard(member, screenHeight)).toList(),
+                children: members
+                    .map((member) =>
+                        _buildMemberCard(member, screenWidth, screenHeight))
+                    .toList(),
               ),
             ],
           ),
@@ -87,9 +128,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
     );
   }
 
-  Widget _buildMemberCard(Map<String, dynamic> member, double screenHeight) {
+  Widget _buildMemberCard(
+      Employee member, double screenWidth, double screenHeight) {
+    // ----------------------- Determine Status Color ---------------------------
     Color statusColor;
-    switch (member["status"]) {
+    switch (member.status) {
       case "active":
         statusColor = Colors.green;
         break;
@@ -103,15 +146,26 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         statusColor = Colors.grey;
     }
 
+    // -------------------------- Member Card Layout ---------------------------
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center, // Center content vertically
+      crossAxisAlignment:
+          CrossAxisAlignment.center, // Center content horizontally
       children: [
         Stack(
           alignment: Alignment.bottomRight,
           children: [
+            // ----------------------- Placeholder Avatar -------------------------
             CircleAvatar(
               radius: screenHeight * 0.04,
-              backgroundImage: NetworkImage(member["image"]),
+              backgroundColor: Colors.blueAccent,
+              child: Icon(
+                Icons.person,
+                size: screenHeight * 0.04,
+                color: Colors.white,
+              ),
             ),
+            // ------------------------ Status Indicator --------------------------
             CircleAvatar(
               radius: screenHeight * 0.012,
               backgroundColor: Colors.white,
@@ -123,8 +177,9 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
           ],
         ),
         SizedBox(height: screenHeight * 0.005),
+        // ------------------------- Employee Name ------------------------------
         Text(
-          member["name"],
+          member.firstName,
           style: TextStyle(fontSize: screenHeight * 0.018),
         ),
       ],

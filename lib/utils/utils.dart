@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,14 @@ void showSnackBar(BuildContext context, String content) {
       content: Text(content),
     ),
   );
+}
+
+List<String> encodeImagesToBase64(List<File?> images) {
+  print(images);
+  return images
+      .where((image) => image != null) // Filter out null values
+      .map((image) => base64Encode(image!.readAsBytesSync()))
+      .toList();
 }
 
 Widget buildTeamSection(

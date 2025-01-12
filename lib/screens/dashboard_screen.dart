@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:task_mvp/screens/new_task_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_mvp/provider/auth_provider.dart';
 
 import '../utils/utils.dart';
+import 'choose_task_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  late Future<SharedPreferences> _prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final employeeProvider =
+          Provider.of<AuthProvider>(context, listen: false);
+      employeeProvider.checkAuth();
+    });
+    _prefs = SharedPreferences.getInstance();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +55,39 @@ class DashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //-------------------- Header Section ------------------------
-                  _buildHeader(
-                    context,
-                    headerFontSize: headerFontSize,
-                    subheaderFontSize: subheaderFontSize,
-                    padding: paddingLarge,
-                    avatarRadius: screenWidth * 0.06,
-                    iconSize: screenWidth * 0.06,
+                  FutureBuilder<SharedPreferences>(
+                    future: SharedPreferences.getInstance(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Padding(
+                          padding: EdgeInsets.all(paddingLarge),
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Padding(
+                          padding: EdgeInsets.all(paddingLarge),
+                          child: Text(
+                            'Error loading user data',
+                            style: TextStyle(
+                              fontSize: headerFontSize,
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      }
+
+                      final prefs = snapshot.data!;
+                      return _buildHeader(
+                        context,
+                        prefs: prefs,
+                        headerFontSize: headerFontSize,
+                        subheaderFontSize: subheaderFontSize,
+                        padding: paddingLarge,
+                        avatarRadius: screenWidth * 0.06,
+                        iconSize: screenWidth * 0.06,
+                      );
+                    },
                   ),
                   //--------------------- Summary Card -------------------------
                   Padding(
@@ -112,7 +159,8 @@ class DashboardScreen extends StatelessWidget {
                                 children: [
                                   //----------------- Add Task Image------------------
                                   Image.asset(
-                                    'assets/add_task.png', // Replace with your actual image path
+                                    'assets/add_task.png',
+                                    // Replace with your actual image path
                                     width: screenWidth * 0.15,
                                     height: screenWidth * 0.15,
                                   ),
@@ -130,7 +178,7 @@ class DashboardScreen extends StatelessWidget {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(context, "/createTask");
+                                ChooseTask(context);
                               },
                               child: Card(
                                 elevation: 4,
@@ -168,6 +216,7 @@ class DashboardScreen extends StatelessWidget {
   //--------------------------- Header Build Method ----------------------------
   Widget _buildHeader(
     BuildContext context, {
+    required SharedPreferences prefs,
     required double headerFontSize,
     required double subheaderFontSize,
     required double padding,
@@ -195,7 +244,7 @@ class DashboardScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hello Aditya',
+                        'Hello ${prefs.getString('firstName')}',
                         style: TextStyle(
                           fontSize: headerFontSize,
                           fontWeight: FontWeight.bold,

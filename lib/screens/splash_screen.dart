@@ -28,18 +28,15 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
     );
-
     // Handle navigation
     _navigateAfterDelay();
   }
 
   Future<void> _navigateAfterDelay() async {
     await Future.delayed(const Duration(seconds: 2));
-
     if (mounted) {
       final authProvider = context.read<AuthProvider>();
       final isSignedIn = await authProvider.checkIfSignedIn();
@@ -47,8 +44,6 @@ class _SplashScreenState extends State<SplashScreen>
       if (isSignedIn) {
         await authProvider.initializeAuthState();
       }
-
-      // Navigate to the appropriate screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
