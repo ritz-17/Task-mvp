@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/task_provider.dart';
-import '../models/task_model.dart';
 
 class EmployeeTaskPage extends StatefulWidget {
   const EmployeeTaskPage({super.key});
@@ -11,12 +11,21 @@ class EmployeeTaskPage extends StatefulWidget {
 }
 
 class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
+  String? _role;
+
   @override
   void initState() {
     super.initState();
-    // Fetch tasks when the screen is initialized
+    _fetchUserRole(); // Fetch the role when the screen is initialized
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TaskProvider>(context, listen: false).fetchTaskList();
+    });
+  }
+
+  Future<void> _fetchUserRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _role = prefs.getString('role'); // Store the user role
     });
   }
 
@@ -36,11 +45,11 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
       ),
       body: Consumer<TaskProvider>(
         builder: (context, taskProvider, _) {
-          final tasks = taskProvider.taskList;
-
           if (taskProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
+
+          final tasks = taskProvider.taskList;
 
           if (tasks.isEmpty) {
             return const Center(
@@ -58,10 +67,10 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
 
               return Card(
                 margin:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
                 child: ListTile(
                   title: Text(
-                    task.title,
+                    'Task: ${task.title}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -74,6 +83,26 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
                       Text("Status: ${task.status}"),
                     ],
                   ),
+                  trailing: _role == 'employee'
+                      ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.cancel, color: Colors.red),
+                        onPressed: () {
+                          // Handle reject action
+                        },
+                      ),
+                      IconButton(
+                        icon:
+                        const Icon(Icons.verified, color: Colors.green),
+                        onPressed: () {
+                          // Handle verify action
+                        },
+                      ),
+                    ],
+                  )
+                      : null, // Hide trailing actions if the role is not 'employee'
                 ),
               );
             },

@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/task_model.dart';
 
 class TaskProvider extends ChangeNotifier {
-  List<Task> _taskList = [];
+  final List<Task> _taskList = [];
   bool _isLoading = false;
 
   List<Task> get taskList => _taskList;
@@ -29,16 +29,33 @@ class TaskProvider extends ChangeNotifier {
     return prefs.getString('userId');
   }
 
-  Future<void> fetchTaskList() async {
+  Future<String?> _getRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('role');
+  }
+
+  Future<void> _setTaskList(List<Task> tasks) async {
+    _taskList.clear();
+    _taskList.addAll(tasks);
+    notifyListeners();
+  }
+
+  Future<List<Task>> fetchTaskList() async {
+    _isLoading = true;
+    notifyListeners();
+
     final token = await _getToken();
     final userId = await _getUserId();
+    final role = await _getRole();
+    print(userId);
 
     if (token == null || userId == null) {
-      throw Exception('Token or User ID not found. User may not be logged in.');
+      _isLoading = false;
+      notifyListeners();
+      throw Exception('User not authenticated.');
     }
 
     final taskUrl = '$baseUrl/task';
-
     try {
       final response = await http.get(
         Uri.parse(taskUrl),
@@ -48,30 +65,28 @@ class TaskProvider extends ChangeNotifier {
         },
       );
 
-      print('Fetch Task Response: ${response.body}'); // Debugging
-
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-
-        if (jsonResponse == null || jsonResponse['success'] != true) {
-          throw Exception('Invalid response format or authorization failed');
-        }
-
-        final taskData = jsonResponse['data'];
+        final taskData = jsonResponse['data'] as List;
 
         if (taskData == null || taskData is! List) {
-          throw Exception('Task data is missing or invalid.');
+          throw Exception('Invalid response format.');
         }
-
-        _taskList = taskData
-            .where((task) =>
-                task['createdBy'] != null &&
-                task['createdBy']['_id'] ==
-                    userId) // Filter tasks created by the user
-            .map((task) => Task.fromJson(task))
-            .toList();
-
-        notifyListeners();
+        if (role == 'employee') {
+          final tasks = taskData
+              .map((json) => Task.fromJson(json))
+              .where((task) => task.assignedTo.user.id == userId)
+              .toList();
+          await _setTaskList(tasks);
+          return tasks;
+        } else {
+          final tasks = taskData
+              .map((json) => Task.fromJson(json))
+              .where((task) => task.createdBy.user.id == userId)
+              .toList();
+          await _setTaskList(tasks);
+          return tasks;
+        }
       } else {
         throw Exception(
             'Failed to fetch tasks: ${response.statusCode} ${response.reasonPhrase}');
@@ -79,6 +94,9 @@ class TaskProvider extends ChangeNotifier {
     } catch (e) {
       print('Error fetching tasks: $e');
       throw Exception('Error fetching tasks: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
@@ -86,10 +104,10 @@ class TaskProvider extends ChangeNotifier {
     String title,
     String description,
     String jobType,
-    String empId, 
-    String priority,{
+    String empId,
+    String priority, {
     String? audioBase64,
-    List<String>? encodedAttachments, 
+    List<String>? encodedAttachments,
   }) async {
     final token = await _getToken();
     final managerId = await _getUserId();
