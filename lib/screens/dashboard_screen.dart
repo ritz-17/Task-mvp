@@ -136,74 +136,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   //----------------------- Create Task Card ----------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: paddingMedium),
-                    child: Card(
-                      elevation: 4,
-                      color: const Color.fromARGB(255, 122, 90, 248),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(paddingMedium),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: paddingLarge,
+                    child: FutureBuilder<SharedPreferences>(
+                      future: _prefs,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error fetching role'));
+                        }
+
+                        final prefs = snapshot.data!;
+                        final role = prefs.getString('role') ?? '';
+
+                        // Only show the card if the role is 'Manager'
+                        if (role == 'manager') {
+                          return Card(
+                            elevation: 4,
+                            color: const Color.fromARGB(255, 122, 90, 248),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            //----------------- Add New Task -------------------
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(paddingMedium),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  //----------------- Add Task Image------------------
-                                  Image.asset(
-                                    'assets/add_task.png',
-                                    // Replace with your actual image path
-                                    width: screenWidth * 0.15,
-                                    height: screenWidth * 0.15,
+                                  SizedBox(width: paddingLarge),
+                                  //----------------- Add New Task -------------------
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        //----------------- Add Task Image------------------
+                                        Image.asset(
+                                          'assets/add_task.png', // Replace with your actual image path
+                                          width: screenWidth * 0.15,
+                                          height: screenWidth * 0.15,
+                                        ),
+                                        SizedBox(width: paddingSmall),
+                                        Text(
+                                          "Add New Task",
+                                          style: TextStyle(
+                                            fontSize: headerFontSize * 0.9,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(width: paddingSmall),
-                                  Text(
-                                    "Add New Task",
-                                    style: TextStyle(
-                                      fontSize: headerFontSize * 0.9,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                  GestureDetector(
+                                    onTap: () {
+                                      ChooseTask(context);
+                                    },
+                                    child: Card(
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: SizedBox(
+                                        width: screenWidth * 0.8,
+                                        height: screenWidth * 0.12,
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.add,
+                                            size: screenWidth * 0.09,
+                                            color: const Color.fromARGB(255, 122, 90, 248),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                ChooseTask(context);
-                              },
-                              child: Card(
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: SizedBox(
-                                  width: screenWidth * 0.8,
-                                  height: screenWidth * 0.12,
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.add,
-                                      size: screenWidth * 0.09,
-                                      color: const Color.fromARGB(
-                                          255, 122, 90, 248),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          );
+                        } else {
+                          // Return an empty container if the role is not 'Manager'
+                          return SizedBox.shrink();
+                        }
+                      },
                     ),
                   ),
+
                 ],
               ),
             ),
@@ -254,7 +272,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Row(
                         children: [
                           Text(
-                            'Manager',
+                            '${prefs.getString('role')}',
                             style: TextStyle(
                               fontSize: subheaderFontSize,
                               color: Colors.grey[600],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:task_mvp/provider/auth_provider.dart';
 import 'package:task_mvp/provider/timer_provider.dart';
@@ -21,7 +20,6 @@ import 'screens/create_short_task_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
   runApp(const MyApp());
 }
 

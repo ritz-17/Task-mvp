@@ -11,6 +11,9 @@ class Task {
   final UserDetail createdBy;
   final String createdAt;
   final String updatedAt;
+  final String priority;
+  final List<String> attachments;
+  final String voice;
 
   Task({
     required this.id,
@@ -23,6 +26,9 @@ class Task {
     required this.createdBy,
     required this.createdAt,
     required this.updatedAt,
+    required this.priority, // New field
+    required this.attachments, // New field
+    required this.voice, // New field
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -37,6 +43,9 @@ class Task {
       createdBy: UserDetail.fromJson(json['createdBy']),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
+      priority: json['priority'],
+      attachments: List<String>.from(json['attachments']),
+      voice: json['voice'],
     );
   }
 }

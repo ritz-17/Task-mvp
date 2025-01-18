@@ -91,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    "Task App",
+                    "TASK-WAN",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
