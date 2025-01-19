@@ -12,10 +12,12 @@ import 'package:task_mvp/screens/signup_screen.dart';
 import 'package:task_mvp/screens/profile_screen.dart';
 import 'package:task_mvp/screens/dashboard_screen.dart';
 import 'package:task_mvp/screens/employee_task_screen.dart';
+import 'package:task_mvp/screens/task_detail_screen.dart';
 import 'package:task_mvp/screens/verification_screen.dart';
 import 'package:task_mvp/screens/verified_screen.dart';
 import 'package:task_mvp/screens/forgot_password_screen.dart';
 
+import 'models/task_model.dart';
 import 'screens/create_short_task_screen.dart';
 
 void main() async {
@@ -49,12 +51,16 @@ class MyApp extends StatelessWidget {
           '/signup': (context) => const SignupPage(),
           '/profile': (context) => const ProfileScreen(),
           '/dashboard': (context) => const DashboardScreen(),
-          '/employeeTasks': (context) => const EmployeeTaskPage(),
+          '/employeeTasks': (context) => const TaskListScreen(),
           '/verification': (context) => const VerificationPage(),
           '/verified': (context) => const VerifiedPage(),
           '/forgotPassword': (context) => const ForgotPasswordPage(),
           '/createLongTask': (context) => const CreateLongTask(),
           '/createShortTask': (context) => const CreateShortTask(),
+          '/task-details': (context) {
+            final taskId = ModalRoute.of(context)?.settings.arguments as String;
+            return TaskDetailScreen(taskId: taskId);
+          },
         },
       ),
     );

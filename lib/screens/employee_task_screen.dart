@@ -3,20 +3,20 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/task_provider.dart';
 
-class EmployeeTaskPage extends StatefulWidget {
-  const EmployeeTaskPage({super.key});
+class TaskListScreen extends StatefulWidget {
+  const TaskListScreen({super.key});
 
   @override
-  State<EmployeeTaskPage> createState() => _EmployeeTaskPageState();
+  State<TaskListScreen> createState() => _TaskListScreenState();
 }
 
-class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
+class _TaskListScreenState extends State<TaskListScreen> {
   String? _role;
 
   @override
   void initState() {
     super.initState();
-    _fetchUserRole(); // Fetch the role when the screen is initialized
+    _fetchUserRole();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TaskProvider>(context, listen: false).fetchTaskList();
     });
@@ -25,7 +25,7 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
   Future<void> _fetchUserRole() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _role = prefs.getString('role'); // Store the user role
+      _role = prefs.getString('role');
     });
   }
 
@@ -64,45 +64,72 @@ class _EmployeeTaskPageState extends State<EmployeeTaskPage> {
             itemCount: tasks.length,
             itemBuilder: (context, index) {
               final task = tasks[index];
+              String taskId = task.id;
 
-              return Card(
-                margin:
-                const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-                child: ListTile(
-                  title: Text(
-                    'Task: ${task.title}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+              return InkWell(
+                onTap: () {
+                  // Navigate to the task details page
+                  Navigator.pushNamed(context, '/task-details',
+                      arguments: taskId);
+                },
+                child: Card(
+                  color: task.status == 'pending'
+                      ? Colors.yellow[100]
+                      : task.status == 'accepted'
+                          ? Colors.green[100]
+                          : Colors.red[100],
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 5.0),
+                  child: ListTile(
+                    title: Text(
+                      'Task: ${task.title}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Description: ${task.description}"),
+                        Text("Status: ${task.status}"),
+                      ],
+                    ),
+                    trailing: _role == 'employee'
+                        ? task.status == 'pending'
+                            ? Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.cancel,
+                                        color: Colors.red),
+                                    onPressed: () {
+                                      // Update the status to 'rejected'
+                                      taskProvider.updateTaskStatus(
+                                          taskId, 'rejected');
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.check_circle,
+                                        color: Colors.green),
+                                    onPressed: () {
+                                      // Update the status to 'accepted'
+                                      taskProvider.updateTaskStatus(
+                                          taskId, 'accepted');
+                                    },
+                                  ),
+                                ],
+                              )
+                            : Icon(
+                                task.status == 'accepted'
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                color: task.status == 'accepted'
+                                    ? Colors.green
+                                    : Colors.red,
+                              )
+                        : null, // Hide trailing actions if the role is not 'employee'
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Description: ${task.description}"),
-                      Text("Status: ${task.status}"),
-                    ],
-                  ),
-                  trailing: _role == 'employee'
-                      ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.cancel, color: Colors.red),
-                        onPressed: () {
-                          // Handle reject action
-                        },
-                      ),
-                      IconButton(
-                        icon:
-                        const Icon(Icons.verified, color: Colors.green),
-                        onPressed: () {
-                          // Handle verify action
-                        },
-                      ),
-                    ],
-                  )
-                      : null, // Hide trailing actions if the role is not 'employee'
                 ),
               );
             },

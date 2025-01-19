@@ -154,4 +154,42 @@ class TaskProvider extends ChangeNotifier {
       throw Exception('Error creating task: $e');
     }
   }
+
+  //update status of task
+  Future<void> updateTaskStatus(String taskId, String status) async {
+    final token = await _getToken();
+    if (token == null) {
+      throw Exception('Token not found. User may not be logged in.');
+    }
+
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/task/$taskId'),
+        headers: {
+          'Authorization': 'Token $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'status': status,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        print('Task status updated successfully');
+        await fetchTaskList();
+        notifyListeners();
+      } else {
+        throw Exception(
+            'Failed to update task status: ${data['message'] ?? response.reasonPhrase}');
+      }
+    } catch (e) {
+      throw Exception('Error updating task status: $e');
+    }
+  }
+
+  Task getTaskById(String taskId) {
+    return _taskList.firstWhere((task) => task.id == taskId);
+  }
 }

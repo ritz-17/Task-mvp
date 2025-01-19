@@ -17,7 +17,7 @@ class _NavBarState extends State<NavBar> {
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
     EmployeeScreen(),
-    EmployeeTaskPage(),
+    TaskListScreen(),
     ProfileScreen(),
   ];
 

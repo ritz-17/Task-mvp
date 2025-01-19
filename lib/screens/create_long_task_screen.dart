@@ -219,7 +219,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const EmployeeTaskPage(),
+                        builder: (_) => const TaskListScreen(),
                       ),
                     );
                   } catch (e) {
