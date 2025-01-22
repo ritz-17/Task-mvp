@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../provider/timer_provider.dart';
 import '../models/task_model.dart';
 import '../provider/task_provider.dart';
-import '../provider/timer_provider.dart';
 
 class TaskDetailScreen extends StatefulWidget {
-  final String taskId; // Pass only the task ID
+  final String taskId;
 
   const TaskDetailScreen({super.key, required this.taskId});
 
@@ -15,7 +15,6 @@ class TaskDetailScreen extends StatefulWidget {
 }
 
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
-  final CountDownController _controller = CountDownController();
   Task? _task;
 
   @override
@@ -26,16 +25,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   Future<void> _fetchTaskDetails() async {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-    _task = taskProvider.getTaskById(widget.taskId); // Fetch task by ID
-    if (_task != null && _task!.status == 'Accepted') {
-      _controller.start();
+    final timerProvider = Provider.of<TimerProvider>(context, listen: false);
+
+    _task = taskProvider.getTaskById(widget.taskId);
+
+    if (_task != null && _task!.status == 'accepted') {
+      if (!timerProvider.isRunning) {
+        timerProvider.startTimer(60);
+      }
     }
+
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final timerProvider = Provider.of<TimerProvider>(context);
+
     if (_task == null) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -65,34 +71,39 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
-            if (_task!.status == 'Accepted')
+            if (_task!.status == 'accepted')
               Center(
                 child: CircularCountDownTimer(
-                  duration: 60,
-                  controller: _controller,
-                  width: 200,
-                  height: 200,
-                  ringColor: Colors.grey.shade300,
-                  fillColor: Colors.green,
-                  backgroundColor: Colors.white,
-                  strokeWidth: 10.0,
-                  strokeCap: StrokeCap.round,
+                  duration: 60, 
+                  initialDuration: 60 -
+                      timerProvider.remainingTime, 
+                  controller: CountDownController(),
+                  width: 200, 
+                  height: 200, 
+                  ringColor: Colors.grey.shade300, 
+                  fillColor: Colors.green, 
+                  backgroundColor: Colors.white, 
+                  strokeWidth: 12.0, 
+                  strokeCap: StrokeCap.round, 
                   textStyle: const TextStyle(
-                    fontSize: 30.0,
+                    fontSize: 28.0, 
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
-                  isReverse: true,
-                  isReverseAnimation: true,
+                  isReverse: true, 
+                  isReverseAnimation: true, 
+                  isTimerTextShown: true, 
+                  autoStart: true, 
                   onComplete: () {
-                    // Notify timer completion
                     timerProvider.stopTimer();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Task time completed!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Task time completed!'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   },
                 ),
               )
@@ -108,12 +119,5 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    final timerProvider = Provider.of<TimerProvider>(context, listen: false);
-    timerProvider.stopTimer();
-    super.dispose();
   }
 }

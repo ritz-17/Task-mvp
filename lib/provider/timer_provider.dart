@@ -1,44 +1,42 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-class TimerProvider with ChangeNotifier {
-  bool _isTimerStarted = false;
-  int _remainingTime = 0; // Remaining time in seconds
+class TimerProvider extends ChangeNotifier {
+  int _totalDuration = 100; // Total duration in seconds
+  int _elapsedTime = 0; // Elapsed time in seconds
   Timer? _timer;
 
-  bool get isTimerStarted => _isTimerStarted;
-  int get remainingTime => _remainingTime;
+  int get remainingTime => _totalDuration - _elapsedTime;
+  double get progress => remainingTime / _totalDuration;
+  bool get isRunning => _timer != null;
 
-  /// Starts the timer with the given duration (in seconds).
-  void startTimer(int durationInSeconds) {
-    _remainingTime = durationInSeconds;
-    _isTimerStarted = true;
-    notifyListeners();
+  void startTimer(int duration) {
+    if (_timer != null) return;
 
+    _totalDuration = duration;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_remainingTime > 0) {
-        _remainingTime--;
+      if (_elapsedTime < _totalDuration) {
+        _elapsedTime++;
         notifyListeners();
       } else {
-        timer.cancel();
-        _isTimerStarted = false;
-        notifyListeners();
+        stopTimer();
       }
     });
-  }
 
-  /// Stops the timer.
-  void stopTimer() {
-    _timer?.cancel();
-    _isTimerStarted = false;
-    _remainingTime = 0;
     notifyListeners();
   }
 
-  /// Resets the timer to the given duration (in seconds).
-  void resetTimer(int durationInSeconds) {
+  void stopTimer() {
+    _timer?.cancel();
+    _timer = null;
+    notifyListeners();
+  }
+
+  void resetTimer(int duration) {
     stopTimer();
-    startTimer(durationInSeconds);
+    _totalDuration = duration;
+    _elapsedTime = 0;
+    notifyListeners();
   }
 
   @override
