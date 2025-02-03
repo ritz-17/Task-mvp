@@ -14,7 +14,6 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   @override
   void initState() {
     super.initState();
-    // ---------------------------------- Load Employees ------------------------------------
     // Load employee data when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final employeeProvider =
@@ -25,16 +24,10 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ----------------------------------- Screen Dimensions --------------------------------
-    // Get the dimensions of the screen for responsive UI
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    // ----------------------------------- Employee Provider --------------------------------
     // Access the EmployeeProvider for data
     final employeeProvider = Provider.of<EmployeeProvider>(context);
-
-    // ----------------------------------- Filtered Employees -------------------------------
     // Categorize employees based on their status
     final employees = employeeProvider.employees;
     final activeMembers =
@@ -54,12 +47,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         centerTitle: true,
       ),
       body: employeeProvider.isLoading
-          ? const Center(
-              child: CircularProgressIndicator()) // Show loading indicator
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              padding: EdgeInsets.all(screenWidth * 0.03),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // ---------------------- Active Members Section ----------------------
                   _buildSection("Active Members", activeMembers, screenWidth,
