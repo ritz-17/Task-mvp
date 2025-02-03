@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../provider/task_provider.dart';
@@ -66,9 +67,8 @@ class _TaskListScreenState extends State<TaskListScreen> {
               final task = tasks[index];
               String taskId = task.id;
 
-              return InkWell(
+              Widget taskTile = InkWell(
                 onTap: () {
-                  // Navigate to the task details page
                   Navigator.pushNamed(context, '/task-details',
                       arguments: taskId);
                 },
@@ -104,7 +104,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                                     icon: const Icon(Icons.cancel,
                                         color: Colors.red),
                                     onPressed: () {
-                                      // Update the status to 'rejected'
                                       taskProvider.updateTaskStatus(
                                           taskId, 'rejected');
                                     },
@@ -113,7 +112,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                                     icon: const Icon(Icons.check_circle,
                                         color: Colors.green),
                                     onPressed: () {
-                                      // Update the status to 'accepted'
                                       taskProvider.updateTaskStatus(
                                           taskId, 'accepted');
                                     },
@@ -128,10 +126,42 @@ class _TaskListScreenState extends State<TaskListScreen> {
                                     ? Colors.green
                                     : Colors.red,
                               )
-                        : null, // Hide trailing actions if the role is not 'employee'
+                        : null, // Hide trailing actions for managers
                   ),
                 ),
               );
+
+              // If role is 'manager', wrap with Slidable
+              return _role == 'manager'
+                  ? Slidable(
+                      key: ValueKey(taskId),
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) {
+                              print("Reassign task: $taskId");
+                              // Handle reassign task action here
+                            },
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            icon: Icons.refresh,
+                            label: 'Reassign',
+                          ),
+                          SlidableAction(
+                            onPressed: (context) async {
+                              await taskProvider.deleteTask(taskId);
+                            },
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            icon: Icons.cancel,
+                            label: 'Cancel',
+                          ),
+                        ],
+                      ),
+                      child: taskTile,
+                    )
+                  : taskTile;
             },
           );
         },

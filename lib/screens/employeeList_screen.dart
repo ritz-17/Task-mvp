@@ -59,11 +59,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   SizedBox(height: screenHeight * 0.03),
 
                   // ------------------------ Free Members Section ----------------------
-                  _buildSection("Free", freeMembers, screenWidth, screenHeight),
+                  _buildSection("Free Members", freeMembers, screenWidth, screenHeight),
                   SizedBox(height: screenHeight * 0.03),
 
                   // -------------------- Unavailable Members Section -------------------
-                  _buildSection("Unavailable", unavailableMembers, screenWidth,
+                  _buildSection("Unavailable Members", unavailableMembers, screenWidth,
                       screenHeight),
                 ],
               ),

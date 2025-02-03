@@ -79,6 +79,13 @@ class TaskProvider extends ChangeNotifier {
           }
         }).whereType<Task>().toList(); // Remove null values
 
+        // Filter tasks based on user role
+        // if (role == 'employee') {
+        //   tasks = tasks.where((task) => task.assignedTo == userId).toList();
+        // } else if (role == 'manager') {
+        //   tasks = tasks.where((task) => task.createdBy == userId).toList();
+        // }
+
         await _setTaskList(tasks);
         return _taskList;
       } else {
