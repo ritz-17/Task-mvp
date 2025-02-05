@@ -48,7 +48,7 @@ void ChooseTask(BuildContext context) {
               child: ListTile(
                 leading: Icon(
                   Icons.access_alarm,
-                  color: Colors.blueAccent,
+                  color: Theme.of(context).primaryColor,
                   size: screenHeight * 0.035,
                 ),
                 title: Text(
@@ -69,7 +69,7 @@ void ChooseTask(BuildContext context) {
               child: ListTile(
                 leading: Icon(
                   Icons.hourglass_bottom,
-                  color: Colors.green,
+                  color: Theme.of(context).primaryColor,
                   size: screenHeight * 0.035,
                 ),
                 title: Text(

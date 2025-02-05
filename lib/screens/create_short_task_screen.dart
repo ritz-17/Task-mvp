@@ -19,7 +19,7 @@ class CreateShortTask extends StatefulWidget {
 }
 
 class _CreateShortTaskState extends State<CreateShortTask> {
-  String? selectedMember;
+  List<String> selectedMembers = [];
   final titleController = TextEditingController();
   final descController = TextEditingController();
 
@@ -29,6 +29,7 @@ class _CreateShortTaskState extends State<CreateShortTask> {
   bool isRecording = false, isPlaying = false;
   String? recordingPath, recordingBase64;
   String? audioPath;
+  DateTime? selectedDeadline;
 
   @override
   void dispose() {
@@ -47,6 +48,135 @@ class _CreateShortTaskState extends State<CreateShortTask> {
           Provider.of<EmployeeProvider>(context, listen: false);
       employeeProvider.loadEmployees();
     });
+  }
+
+  //multiple member selection dialog
+  void showMultiSelectDialog(List employees) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              padding: const EdgeInsets.all(16.0),
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Column(
+                children: [
+                  const Text("Select Members",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: employees.length,
+                      itemBuilder: (context, index) {
+                        final employee = employees[index];
+                        return CheckboxListTile(
+                          title: Text(
+                              '${employee.firstName} ${employee.lastName}'),
+                          value: selectedMembers.contains(employee.id),
+                          onChanged: (value) {
+                            setState(() {
+                              value == true
+                                  ? selectedMembers.add(employee.id)
+                                  : selectedMembers.remove(employee.id);
+                            });
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {});
+                    },
+                    child: const Text("Confirm"),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  //pick deadline
+  Future<void> pickDeadline(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        setState(() {
+          selectedDeadline = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+        });
+      }
+    }
+  }
+
+  Future<void> startRecording() async {
+    if (await audioRecorder.hasPermission()) {
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final String audioPath = p.join(appDir.path, "task_audio.wav");
+      await audioRecorder.start(const RecordConfig(), path: audioPath);
+      setState(() {
+        isRecording = true;
+        recordingPath = null;
+      });
+      showSnackBar(context, "Recording started...");
+    }
+  }
+
+  Future<void> stopRecording() async {
+    final filePath = await audioRecorder.stop();
+    if (filePath != null) {
+      final fileBytes = await File(filePath).readAsBytes();
+      final base64Audio = base64Encode(fileBytes);
+      setState(() {
+        isRecording = false;
+        recordingPath = filePath;
+        recordingBase64 = base64Audio;
+      });
+      showSnackBar(context, "Recording saved");
+    }
+  }
+
+  Future<void> playRecording() async {
+    if (recordingPath != null) {
+      await audioPlayer.setFilePath(recordingPath!);
+      await audioPlayer.play();
+      setState(() => isPlaying = true);
+      audioPlayer.playerStateStream.listen((state) {
+        if (state.processingState == ProcessingState.completed) {
+          setState(() => isPlaying = false);
+        }
+      });
+    }
+  }
+
+  void deleteRecording() {
+    setState(() {
+      recordingPath = null;
+      recordingBase64 = null;
+    });
+    showSnackBar(context, "Recording deleted");
   }
 
   @override
@@ -102,94 +232,80 @@ class _CreateShortTaskState extends State<CreateShortTask> {
 
               SizedBox(height: screenHeight * 0.02),
 
-              // ------------------------- Assign To Dropdown ------------------------
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  prefixIcon:
-                      Icon(Icons.person, color: Theme.of(context).primaryColor),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+              // Multi-Select Member
+              GestureDetector(
+                onTap: () => showMultiSelectDialog(freeMembers),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(selectedMembers.isEmpty
+                          ? "Select Members"
+                          : "${selectedMembers.length} members selected"),
+                      const Icon(Icons.arrow_drop_down)
+                    ],
                   ),
                 ),
-                hint: const Text("Select Member"),
-                value: selectedMember,
-                onChanged: (value) {
-                  setState(() {
-                    selectedMember = value;
-                  });
-                },
-                items: freeMembers
-                    .map((employee) => DropdownMenuItem(
-                          value: employee.id,
-                          child: Text(
-                              '${employee.firstName} ${employee.lastName}'),
-                        ))
-                    .toList(),
+              ),
+
+              SizedBox(height: screenHeight * 0.02),
+
+              // Deadline Selection
+              GestureDetector(
+                onTap: () => pickDeadline(context),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedDeadline == null
+                            ? "Select Deadline"
+                            : selectedDeadline!.toUtc().toIso8601String(),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const Icon(Icons.calendar_today),
+                    ],
+                  ),
+                ),
               ),
 
               SizedBox(height: screenHeight * 0.02),
 
               // ------------------------- Record Audio Button ------------------------
-              FloatingActionButton.extended(
-                onPressed: () async {
-                  if (isRecording) {
-                    // Stop recording
-                    final filePath = await audioRecorder.stop();
-                    if (filePath != null) {
-                      final fileBytes = await File(filePath).readAsBytes();
-                      final base64Audio = base64Encode(fileBytes);
 
-                      setState(() {
-                        isRecording = false;
-                        recordingPath = filePath;
-                        recordingBase64 =
-                            base64Audio; // Save Base64 audio string
-                      });
-
-                      showSnackBar(context, "Recording saved.");
-                    }
-                  } else {
-                    if (await audioRecorder.hasPermission()) {
-                      final Directory appDir =
-                          await getApplicationDocumentsDirectory();
-                      final String audioPath =
-                          p.join(appDir.path, "task_audio.wav");
-                      await audioRecorder.start(const RecordConfig(),
-                          path: audioPath);
-
-                      setState(() {
-                        isRecording = true;
-                        recordingPath = null;
-                      });
-
-                      showSnackBar(context, "Recording started...");
-                    }
-                  }
-                },
-                label: Text(isRecording ? "Stop Recording" : "Start Recording"),
-                icon: Icon(isRecording ? Icons.stop : Icons.mic),
-              ),
-
-              if (recordingPath != null) ...[
-                SizedBox(height: screenHeight * 0.02),
-
-                // ------------------------- Play Audio Button ------------------------
+              if (recordingPath == null) ...[
                 ElevatedButton(
-                  onPressed: () async {
-                    if (isPlaying) {
-                      await audioPlayer.stop();
-                      setState(() {
-                        isPlaying = false;
-                      });
-                    } else {
-                      await audioPlayer.setFilePath(recordingPath!);
-                      await audioPlayer.play();
-                      setState(() {
-                        isPlaying = true;
-                      });
-                    }
-                  },
-                  child: Text(isPlaying ? "Stop Playback" : "Play Recording"),
+                  onPressed: isRecording ? stopRecording : startRecording,
+                  child:
+                      Text(isRecording ? "Stop Recording" : "Start Recording"),
+                ),
+              ] else ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: playRecording,
+                      child: Text(isPlaying ? "Playing..." : "Play Recording"),
+                    ),
+                    ElevatedButton(
+                      onPressed: deleteRecording,
+                      child: const Text("Delete Recording"),
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    ),
+                  ],
                 ),
               ],
 
@@ -200,8 +316,8 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (selectedMember == null) {
-                      showSnackBar(context, "Please select a member.");
+                    if (selectedMembers.isEmpty) {
+                      showSnackBar(context, "Please select a members");
                       return;
                     }
 
@@ -212,9 +328,11 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                         titleController.text,
                         descController.text,
                         "short",
-                        selectedMember!,
+                        selectedMembers,
                         "high",
-                        audioBase64: recordingBase64, // Send audio as Base64
+                        recordingBase64,
+                        [],
+                        selectedDeadline!,
                       );
 
                       // Show success message
@@ -223,9 +341,8 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                       // Navigate to the employee tasks screen
                       Navigator.pushReplacementNamed(context, '/employeeTasks');
                     } catch (e) {
-                      showSnackBar(context, "Error creating task: $e");
-                      print("====================================");
-                      print(e);
+                      debugPrint(e.toString());
+                      showSnackBar(context, "Error creating task");
                     }
                   },
                   style: ElevatedButton.styleFrom(

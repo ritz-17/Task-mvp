@@ -14,7 +14,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  late Future<SharedPreferences> _prefs;
+  late SharedPreferences _prefs;
+  bool _isLoadingPrefs = true;
 
   @override
   void initState() {
@@ -24,7 +25,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Provider.of<AuthProvider>(context, listen: false);
       employeeProvider.checkAuth();
     });
-    _prefs = SharedPreferences.getInstance();
+    _loadSharedPreferences();
+  }
+
+  // Load SharedPreferences in initState
+  Future<void> _loadSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isLoadingPrefs = false;
+    });
   }
 
   @override
@@ -55,39 +64,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   //-------------------- Header Section ------------------------
-                  FutureBuilder<SharedPreferences>(
-                    future: SharedPreferences.getInstance(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Padding(
-                          padding: EdgeInsets.all(paddingLarge),
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (snapshot.hasError) {
-                        return Padding(
-                          padding: EdgeInsets.all(paddingLarge),
-                          child: Text(
-                            'Error loading user data',
-                            style: TextStyle(
-                              fontSize: headerFontSize,
-                              color: Colors.red,
-                            ),
+                  Padding(
+                    padding: EdgeInsets.all(paddingLarge),
+                    child: _isLoadingPrefs
+                        ? const Center(child: CircularProgressIndicator())
+                        : _buildHeader(
+                            context,
+                            prefs: _prefs,
+                            headerFontSize: headerFontSize,
+                            subheaderFontSize: subheaderFontSize,
+                            padding: paddingLarge,
+                            avatarRadius: screenWidth * 0.06,
+                            iconSize: screenWidth * 0.06,
                           ),
-                        );
-                      }
-
-                      final prefs = snapshot.data!;
-                      return _buildHeader(
-                        context,
-                        prefs: prefs,
-                        headerFontSize: headerFontSize,
-                        subheaderFontSize: subheaderFontSize,
-                        padding: paddingLarge,
-                        avatarRadius: screenWidth * 0.06,
-                        iconSize: screenWidth * 0.06,
-                      );
-                    },
                   ),
                   //--------------------- Summary Card -------------------------
                   Padding(
@@ -133,95 +122,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                   ),
-                  //----------------------- Create Task Card ----------------------
+                  //----------------------- Create Task Card -------------------
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: paddingMedium),
-                    child: FutureBuilder<SharedPreferences>(
-                      future: _prefs,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Error fetching role'));
-                        }
-
-                        final prefs = snapshot.data!;
-                        final role = prefs.getString('role') ?? '';
-
-                        // Only show the card if the role is 'Manager'
-                        if (role == 'manager') {
-                          return Card(
-                            elevation: 4,
-                            color: const Color.fromARGB(255, 122, 90, 248),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(paddingMedium),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(width: paddingLarge),
-                                  //----------------- Add New Task -------------------
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        //----------------- Add Task Image------------------
-                                        Image.asset(
-                                          'assets/add_task.png', // Replace with your actual image path
-                                          width: screenWidth * 0.15,
-                                          height: screenWidth * 0.15,
-                                        ),
-                                        SizedBox(width: paddingSmall),
-                                        Text(
-                                          "Add New Task",
-                                          style: TextStyle(
-                                            fontSize: headerFontSize * 0.9,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      ChooseTask(context);
-                                    },
-                                    child: Card(
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: SizedBox(
-                                        width: screenWidth * 0.8,
-                                        height: screenWidth * 0.12,
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.add,
-                                            size: screenWidth * 0.09,
-                                            color: const Color.fromARGB(255, 122, 90, 248),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        } else {
-                          // Return an empty container if the role is not 'Manager'
-                          return SizedBox.shrink();
-                        }
-                      },
-                    ),
+                    child: _isLoadingPrefs
+                        ? const Center(child: CircularProgressIndicator())
+                        : _buildCreateTaskCard(
+                            context,
+                            prefs: _prefs,
+                            headerFontSize: headerFontSize,
+                            paddingMedium: paddingMedium,
+                            paddingLarge: paddingLarge,
+                            paddingSmall: paddingSmall,
+                            screenWidth: screenWidth,
+                          ),
                   ),
-
                 ],
               ),
             ),
@@ -241,80 +156,160 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required double avatarRadius,
     required double iconSize,
   }) {
-    return Padding(
-      padding: EdgeInsets.all(padding),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          //-------------------- Profile and Info ------------------------------
-          Expanded(
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: avatarRadius,
-                  backgroundImage: const NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/512/2815/2815428.png',
-                  ),
-                ),
-                SizedBox(width: padding),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hello ${prefs.getString('firstName')}',
-                        style: TextStyle(
-                          fontSize: headerFontSize,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            '${prefs.getString('role')}',
-                            style: TextStyle(
-                              fontSize: subheaderFontSize,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          SizedBox(width: padding * 0.3),
-                          Icon(
-                            Icons.verified,
-                            color: Colors.blue,
-                            size: subheaderFontSize * 1.2,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          //-------------------- Notification and Settings Icons ---------------
-          Row(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        //-------------------- Profile and Info --------------------------------
+        Expanded(
+          child: Row(
             children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () {},
-                iconSize: iconSize,
-                padding: EdgeInsets.all(padding * 0.3),
+              CircleAvatar(
+                radius: avatarRadius,
+                backgroundImage: const NetworkImage(
+                  'https://cdn-icons-png.flaticon.com/512/2815/2815428.png',
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.settings_outlined),
-                onPressed: () {},
-                iconSize: iconSize,
-                padding: EdgeInsets.all(padding * 0.3),
+              SizedBox(width: padding),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Hello ${prefs.getString('firstName')}',
+                      style: TextStyle(
+                        fontSize: headerFontSize,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          '${prefs.getString('role')}',
+                          style: TextStyle(
+                            fontSize: subheaderFontSize,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(width: padding * 0.3),
+                        Icon(
+                          Icons.verified,
+                          color: Colors.blue,
+                          size: subheaderFontSize * 1.2,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        //-------------------- Notification and Settings Icons -----------------
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.notifications_outlined),
+              onPressed: () {},
+              iconSize: iconSize,
+              padding: EdgeInsets.all(padding * 0.3),
+            ),
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () {},
+              iconSize: iconSize,
+              padding: EdgeInsets.all(padding * 0.3),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
-  //------------------------ Summary Card Build Method -------------------------
+  //----------------------- Create Task Card Build Method ----------------------
+  Widget _buildCreateTaskCard(
+    BuildContext context, {
+    required SharedPreferences prefs,
+    required double headerFontSize,
+    required double paddingMedium,
+    required double paddingLarge,
+    required double paddingSmall,
+    required double screenWidth,
+  }) {
+    final role = prefs.getString('role') ?? '';
+
+    // Only show the card if the role is 'Manager'
+    if (role == 'manager') {
+      return Card(
+        elevation: 4,
+        color: const Color.fromARGB(255, 122, 90, 248),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(paddingMedium),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(width: paddingLarge),
+              //----------------- Add New Task -------------------
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //----------------- Add Task Image------------------
+                    Image.asset(
+                      'assets/add_task.png',
+                      // Replace with your actual image path
+                      width: screenWidth * 0.15,
+                      height: screenWidth * 0.15,
+                    ),
+                    SizedBox(width: paddingSmall),
+                    Text(
+                      "Add New Task",
+                      style: TextStyle(
+                        fontSize: headerFontSize * 0.9,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  ChooseTask(context);
+                },
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: SizedBox(
+                    width: screenWidth * 0.8,
+                    height: screenWidth * 0.12,
+                    child: Center(
+                      child: Icon(
+                        Icons.add,
+                        size: screenWidth * 0.09,
+                        color: const Color.fromARGB(255, 122, 90, 248),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      // Return an empty container if the role is not 'Manager'
+      return SizedBox.shrink();
+    }
+  }
+
   Widget _buildSummaryCard(
     BuildContext context, {
     required double titleSize,

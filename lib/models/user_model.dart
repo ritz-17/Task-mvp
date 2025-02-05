@@ -25,6 +25,9 @@ class UserDetail {
       hireDate: json['hireDate'],
     );
   }
+  factory UserDetail.empty() {
+    return UserDetail(id: '', user: User.fromJson({}), dateOfBirth: '', address: '', hireDate: '');
+  }
 }
 
 class User {

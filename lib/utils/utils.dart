@@ -5,9 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 void showSnackBar(BuildContext context, String content) {
+
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(content),
+      content: Expanded(
+        child: Text(
+          content,
+          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      ),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 8,
+      duration: const Duration(seconds: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
     ),
   );
 }
@@ -15,7 +28,7 @@ void showSnackBar(BuildContext context, String content) {
 List<String> encodeImagesToBase64(List<File?> images) {
   print(images);
   return images
-      .where((image) => image != null) // Filter out null values
+      .where((image) => image != null)
       .map((image) => base64Encode(image!.readAsBytesSync()))
       .toList();
 }
@@ -262,10 +275,10 @@ Future<void> _processImage({
     }
   } catch (e) {
     updateState(() {
-      isUploading[index] = false; // End upload animation in case of error
+      isUploading[index] = false; // End upload animation
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Error picking image: ${e.toString()}")),
-    );
+    showSnackBar(context, 'Error picking image');
   }
 }
+
+

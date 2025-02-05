@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../provider/auth_provider.dart';
 import '../utils/login_text_field.dart';
 import '../utils/utils.dart';
 
@@ -23,6 +23,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
@@ -89,34 +90,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               showSnackBar(context, 'Please enter email');
                               return;
                             }
-
                             setState(() {
                               isLoading = true;
                             });
-
-                            final response = await http.post(
-                              Uri.parse(
-                                  'https://backend.taskmaster.outlfy.com/manager/forgot-password'),
-                              headers: <String, String>{
-                                'Content-Type':
-                                    'application/json; charset=UTF-8',
-                              },
-                              body: jsonEncode(<String, String>{
-                                'email': emailController.text,
-                              }),
-                            );
-
-                            if (response.statusCode == 200) {
-                              // Handle successful email sending
-                              print('Email sent successfully!');
-                              showSnackBar(context, 'Email sent successfully!');
-                            } else {
-                              // Handle API errors
-                              print(
-                                  'Error sending email: ${response.statusCode}');
-                              showSnackBar(context, 'Error sending email!');
-                            }
-
+                            authProvider
+                                .forgotPassword(emailController.text)
+                                .then((value) {
+                              showSnackBar(context, 'Email sent successfully');
+                            }).catchError((error) {
+                              showSnackBar(context, error.toString());
+                            });
                             setState(() {
                               isLoading = false;
                             });
