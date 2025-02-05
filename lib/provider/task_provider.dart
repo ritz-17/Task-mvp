@@ -64,7 +64,7 @@ class TaskProvider extends ChangeNotifier {
         final jsonResponse = jsonDecode(response.body);
 
         if (jsonResponse['data'] is! List) {
-          throw Exception("Invalid data format received: ${jsonResponse['data']}");
+          throw Exception("Invalid data format received");
         }
 
         final taskData = jsonResponse['data'] as List;
@@ -73,8 +73,6 @@ class TaskProvider extends ChangeNotifier {
           try {
             return Task.fromJson(json);
           } catch (e) {
-            print("Error parsing task: $json \n");
-            print("Error $e");
             return null; // Filter out problematic entries
           }
         }).whereType<Task>().toList(); // Remove null values
@@ -90,10 +88,10 @@ class TaskProvider extends ChangeNotifier {
         return _taskList;
       } else {
         throw Exception(
-            'Failed to fetch tasks: ${response.statusCode} ${response.reasonPhrase}');
+            'Failed to fetch tasks');
       }
     } catch (e) {
-      throw Exception('Error fetching tasks: $e');
+      throw Exception('Error fetching tasks');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -145,10 +143,10 @@ class TaskProvider extends ChangeNotifier {
       if (response.statusCode == 201) {
         // await fetchTaskList();
       } else {
-        throw Exception('Failed to create task: ${data['error'] ?? response.reasonPhrase}');
+        throw Exception('Failed to create task');
       }
     } catch (e) {
-      throw Exception('Error creating task: $e');
+      throw Exception('Error creating task');
     }
   }
 
@@ -174,10 +172,10 @@ class TaskProvider extends ChangeNotifier {
         await fetchTaskList();
         notifyListeners();
       } else {
-        throw Exception('Failed to update task status: ${data['message'] ?? response.reasonPhrase}');
+        throw Exception('Failed to update task status');
       }
     } catch (e) {
-      throw Exception('Error updating task status: $e');
+      throw Exception('Error updating task status');
     }
   }
 
@@ -206,10 +204,10 @@ class TaskProvider extends ChangeNotifier {
         await fetchTaskList();
         notifyListeners();
       } else {
-        throw Exception('Failed to delete task: ${data['message'] ?? response.reasonPhrase}');
+        throw Exception('Failed to delete task');
       }
     } catch (e) {
-      throw Exception('Error deleting task: $e');
+      throw Exception('Error deleting task');
     }
   }
 

@@ -208,7 +208,7 @@ class _SignupPageState extends State<SignupPage> {
                               );
                             } catch (e) {
                               showSnackBar(context,
-                                  'Signup failed: ${e.toString()}');
+                                  'Signup failed. Please try again.');
                             } finally {
                               setState(() {
                                 isLoading = false;

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:task_mvp/provider/task_provider.dart';
 import 'package:task_mvp/utils/utils.dart';
 import '../provider/employee_provider.dart';
-import 'employee_task_screen.dart';
+import 'task_list_screen.dart';
 
 class CreateLongTask extends StatefulWidget {
   const CreateLongTask({super.key});
@@ -304,7 +304,7 @@ class _CreateLongTaskState extends State<CreateLongTask> {
               ElevatedButton(
                 onPressed: () async {
                   if (selectedMembers.isEmpty || selectedPriority == null) {
-                    showSnackBar(context, "Please complete all fields.");
+                    showSnackBar(context, "Please complete all fields");
                     return;
                   }
 
@@ -331,7 +331,8 @@ class _CreateLongTaskState extends State<CreateLongTask> {
                       MaterialPageRoute(builder: (_) => const TaskListScreen()),
                     );
                   } catch (e) {
-                    showSnackBar(context, "Error: $e");
+                    debugPrint(e.toString());
+                    showSnackBar(context, "Error creating task");
                   }
                 },
                 child: const Text("Create Task"),

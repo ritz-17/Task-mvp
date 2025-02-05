@@ -28,12 +28,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       userId = prefs.getString('userId') ?? 'Not Available';
-      Name = '${prefs.getString('firstName') ?? 'Not Available'} ${prefs.getString('lastName') ?? ''}';
+      Name =
+          '${prefs.getString('firstName') ?? 'Not Available'} ${prefs.getString('lastName') ?? ''}';
       email = prefs.getString('email') ?? 'Not Available';
       role = prefs.getString('role') ?? 'Not Available';
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: const Text("Cancel")),
                     TextButton(
                         onPressed: () async {
-                          await Provider.of<AuthProvider>(context, listen: false)
+                          await Provider.of<AuthProvider>(context,
+                                  listen: false)
                               .logout();
                           Navigator.pop(context);
                           Navigator.pushReplacement(
@@ -105,9 +106,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             //-------------------------- Profile Picture -----------------------
             CircleAvatar(
               radius: 70,
-              backgroundImage: NetworkImage(
-                'https://images.pexels.com/photos/16869355/pexels-photo-16869355/free-photo-of-black-and-white-shot-of-a-man-in-a-suit.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-              ),
+              backgroundColor: Theme.of(context).primaryColor,
+              child: Icon(Icons.person, size: 70, color: Colors.white),
             ),
             const SizedBox(height: 20),
 

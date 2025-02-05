@@ -85,18 +85,15 @@ class AuthProvider extends ChangeNotifier {
           await prefs.setBool('isVerified', user.isVerified);
           await prefs.setString('createdAt', user.createdAt);
           await prefs.setString('updatedAt', user.updatedAt);
-
-          debugPrint('User details stored successfully: ${user.toString()}');
           notifyListeners();
         } else {
-          throw Exception('Authorization failed: ${jsonResponse['message']}');
+          throw Exception('Authorization failed');
         }
       } else {
-        throw Exception('Failed to fetch $role: ${response.reasonPhrase}');
+        throw Exception('Failed to fetch role data');
       }
     } catch (e) {
-      debugPrint('Authorization exception: $e');
-      throw Exception('Authorization exception: $e');
+      throw Exception('Authorization exception');
     }
   }
 
@@ -151,14 +148,11 @@ class AuthProvider extends ChangeNotifier {
         await prefs.setBool('isSignedIn', true);
         _isSignedIn = true;
         notifyListeners();
-        debugPrint('Registration successful');
       } else {
-        throw Exception(
-            data['message'] ?? 'Unknown error during registration.');
+        throw Exception('Unknown error during registration');
       }
     } catch (e) {
-      debugPrint('Registration error: $e');
-      throw Exception('Registration error: $e');
+      throw Exception('Registration error');
     }
   }
 
@@ -202,11 +196,10 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         debugPrint('Login successful');
       } else {
-        throw Exception(data['error'] ?? 'Unknown error during login.');
+        throw Exception(data['error'] ?? 'Unknown error during login');
       }
     } catch (e) {
-      debugPrint('Login error: $e');
-      throw Exception('Login error: $e');
+      throw Exception('Login error');
     }
   }
 
@@ -220,6 +213,30 @@ class AuthProvider extends ChangeNotifier {
     _token = null;
     _role = null;
     notifyListeners();
-    debugPrint('User logged out successfully');
   }
+
+  // Forgot password method
+  Future<void> forgotPassword(String email) async {
+    final forgotPasswordUrl = '$baseUrl/$role/forgot-password';
+
+    try {
+      final response = await http.post(
+        Uri.parse(forgotPasswordUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('Email sent successfully!');
+      } else {
+        throw Exception('Error sending email');
+      }
+    } catch (e) {
+      throw Exception('Error sending email');
+    }
+  }
+
+
 }

@@ -19,7 +19,7 @@ class EmployeeService {
   static Future<List<Employee>> fetchEmployees() async {
     final token = await _getToken();
     if (token == null) {
-      throw Exception('Token not found. User may not be logged in.');
+      throw Exception('Token not found. User may not be logged in');
     }
 
     final response = await http.get(
@@ -34,7 +34,7 @@ class EmployeeService {
       final List<dynamic> jsonList = jsonDecode(response.body);
       return jsonList.map((json) => Employee.fromJson(json)).toList();
     } else {
-      throw Exception('Failed to fetch employees: ${response.reasonPhrase}');
+      throw Exception('Failed to fetch employees');
     }
   }
 }

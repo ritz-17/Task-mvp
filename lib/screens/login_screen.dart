@@ -145,7 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                               } catch (e) {
                                 showSnackBar(
-                                    context, 'Login failed: ${e.toString()}');
+                                    context, 'Login failed. Try again later');
                               } finally {
                                 setState(() {
                                   isLoading = false;

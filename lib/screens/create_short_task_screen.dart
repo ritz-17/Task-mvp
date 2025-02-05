@@ -154,7 +154,7 @@ class _CreateShortTaskState extends State<CreateShortTask> {
         recordingPath = filePath;
         recordingBase64 = base64Audio;
       });
-      showSnackBar(context, "Recording saved.");
+      showSnackBar(context, "Recording saved");
     }
   }
 
@@ -176,7 +176,7 @@ class _CreateShortTaskState extends State<CreateShortTask> {
       recordingPath = null;
       recordingBase64 = null;
     });
-    showSnackBar(context, "Recording deleted.");
+    showSnackBar(context, "Recording deleted");
   }
 
   @override
@@ -317,7 +317,7 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (selectedMembers.isEmpty) {
-                      showSnackBar(context, "Please select a member.");
+                      showSnackBar(context, "Please select a members");
                       return;
                     }
 
@@ -341,8 +341,8 @@ class _CreateShortTaskState extends State<CreateShortTask> {
                       // Navigate to the employee tasks screen
                       Navigator.pushReplacementNamed(context, '/employeeTasks');
                     } catch (e) {
-                      showSnackBar(context, "Error creating task: $e");
-                      print(e);
+                      debugPrint(e.toString());
+                      showSnackBar(context, "Error creating task");
                     }
                   },
                   style: ElevatedButton.styleFrom(
